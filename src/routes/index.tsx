@@ -147,7 +147,7 @@ function Landing() {
   };
 
   return (
-    <div ref={ref} className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div ref={ref} className="min-h-dvh bg-background text-foreground overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50">
         <div className="container mx-auto px-4 mt-4">
