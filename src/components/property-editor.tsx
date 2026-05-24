@@ -307,7 +307,7 @@ function NumField({ label, value, onChange }: { label: string; value: number; on
   );
 }
 
-function ListEditor({ label, items, fields, empty, onChange }: { label: string; items: any[]; fields: string[]; empty: any; onChange: (items: any[]) => void }) {
+function ListEditor({ label, items, fields, empty, onChange, pages, hrefField }: { label: string; items: any[]; fields: string[]; empty: any; onChange: (items: any[]) => void; pages?: Pick<ProjectPage, "id" | "name" | "slug">[]; hrefField?: string }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -333,6 +333,14 @@ function ListEditor({ label, items, fields, empty, onChange }: { label: string; 
                 onChange={(e) => onChange(items.map((x, j) => (j === i ? { ...x, [f]: e.target.value } : x)))}
               />
             ))}
+            {hrefField && pages && pages.length > 0 && (
+              <PagePicker
+                pages={pages}
+                onPick={(href) =>
+                  onChange(items.map((x, j) => (j === i ? { ...x, [hrefField]: href } : x)))
+                }
+              />
+            )}
           </div>
         ))}
       </div>
