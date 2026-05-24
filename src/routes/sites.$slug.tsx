@@ -150,7 +150,7 @@ function SitePage() {
   const gfHref = googleFontsHref(typoPreset);
 
   return (
-    <div
+    <main
       dir={dir}
       lang={lang}
       className="wb-canvas"
@@ -159,6 +159,6 @@ function SitePage() {
       <ScrollProgressBar />
       {gfHref && <link rel="stylesheet" href={gfHref} />}
       {blocks.map((b) => <BlockRenderer key={b.id} block={b} branding={branding} />)}
-    </div>
+    </main>
   );
 }

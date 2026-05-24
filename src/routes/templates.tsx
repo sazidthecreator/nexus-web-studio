@@ -151,7 +151,7 @@ function TemplatesPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-10 max-w-7xl">
+    <main className="container mx-auto px-4 py-10 max-w-7xl">
       <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Templates</h1>
@@ -279,7 +279,7 @@ function TemplatesPage() {
           ))}
         </div>
       )}
-    </div>
+    </main>
   );
 }
 

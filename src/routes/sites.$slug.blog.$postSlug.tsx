@@ -54,22 +54,24 @@ function PostPage() {
           </Link>
         </div>
       </header>
-      <article className="container mx-auto max-w-3xl px-6 py-10">
-        {post.cover_url && (
-          <img src={post.cover_url} alt="" className="w-full aspect-[2/1] object-cover rounded-xl mb-8" />
-        )}
-        <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
-        {post.excerpt && <p className="text-lg text-muted-foreground mt-3">{post.excerpt}</p>}
-        {post.published_at && (
-          <time className="text-xs text-muted-foreground block mt-2">
-            {new Date(post.published_at).toLocaleDateString()}
-          </time>
-        )}
-        <div
-          className="prose prose-neutral dark:prose-invert max-w-none mt-8"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      </article>
+      <main>
+        <article className="container mx-auto max-w-3xl px-6 py-10">
+          {post.cover_url && (
+            <img src={post.cover_url} alt="" className="w-full aspect-[2/1] object-cover rounded-xl mb-8" />
+          )}
+          <h1 className="text-4xl font-bold tracking-tight">{post.title}</h1>
+          {post.excerpt && <p className="text-lg text-muted-foreground mt-3">{post.excerpt}</p>}
+          {post.published_at && (
+            <time className="text-xs text-muted-foreground block mt-2">
+              {new Date(post.published_at).toLocaleDateString()}
+            </time>
+          )}
+          <div
+            className="prose prose-neutral dark:prose-invert max-w-none mt-8"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        </article>
+      </main>
     </div>
   );
 }

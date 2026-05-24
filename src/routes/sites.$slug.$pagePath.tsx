@@ -101,10 +101,10 @@ function SubPage() {
   const gfHref = googleFontsHref(typoPreset);
 
   return (
-    <div dir={dir} lang={lang} className="wb-canvas" style={{ fontFamily: branding.fontFamily, ...typoStyleVars(typoPreset) }}>
+    <main dir={dir} lang={lang} className="wb-canvas" style={{ fontFamily: branding.fontFamily, ...typoStyleVars(typoPreset) }}>
       {gfHref && <link rel="stylesheet" href={gfHref} />}
       {blocks.map((b) => <BlockRenderer key={b.id} block={b} branding={branding} />)}
-    </div>
+    </main>
   );
 }
 

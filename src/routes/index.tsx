@@ -227,6 +227,9 @@ function Landing() {
         </div>
       </header>
 
+      <main>
+
+
       {/* Hero */}
       <section
         className="relative"
@@ -732,6 +735,8 @@ function Landing() {
           </div>
         </div>
       </section>
+
+      </main>
 
       <footer className="border-t border-border/40">
         <div className="container mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
