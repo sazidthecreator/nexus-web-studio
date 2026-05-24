@@ -6,6 +6,9 @@ import { BlockRenderer } from "@/components/block-renderer";
 import { DEFAULT_BRANDING, type Block, type ProjectContent } from "@/lib/blocks";
 import { getTypoPreset, googleFontsHref, typoStyleVars } from "@/lib/typography";
 import { isRtl } from "@/lib/i18n";
+import { initScrollReveal } from "@/lib/scroll-reveal";
+import { ScrollProgressBar } from "@/components/published/scroll-progress-bar";
+import { trackVitals } from "@/lib/vitals";
 import { useEffect, useMemo } from "react";
 import { z } from "zod";
 
