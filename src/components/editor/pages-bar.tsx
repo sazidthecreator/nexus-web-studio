@@ -11,14 +11,15 @@ import {
   SortableContext, arrayMove, useSortable, horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { ProjectContent } from "@/lib/blocks";
+import type { ProjectContent, ProjectPage } from "@/lib/blocks";
 import { uid } from "@/lib/blocks";
+import { PageSettingsButton } from "./page-settings";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-type Page = ProjectContent["pages"][number];
+type Page = ProjectPage;
 
 export function PagesBar({
   pages, currentPageId, onChange, onSwitch,
@@ -44,6 +45,9 @@ export function PagesBar({
   function rename(id: string, name: string) {
     const clean = name.trim() || "Untitled";
     onChange(pages.map((p) => (p.id === id ? { ...p, name: clean } : p)));
+  }
+  function patchPage(id: string, patch: Partial<Page>) {
+    onChange(pages.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }
   function remove(id: string) {
     if (pages.length <= 1) return;
@@ -79,6 +83,7 @@ export function PagesBar({
                 onCommitRename={() => { rename(p.id, draftName); setEditingId(null); }}
                 onCancelRename={() => setEditingId(null)}
                 onRequestDelete={() => setConfirmDeleteId(p.id)}
+                onPatch={(patch) => patchPage(p.id, patch)}
               />
             ))}
           </div>
@@ -111,11 +116,12 @@ export function PagesBar({
 
 function SortablePageTab({
   page, active, editing, draftName, canDelete,
-  onSwitch, onStartRename, onChangeDraft, onCommitRename, onCancelRename, onRequestDelete,
+  onSwitch, onStartRename, onChangeDraft, onCommitRename, onCancelRename, onRequestDelete, onPatch,
 }: {
   page: Page; active: boolean; editing: boolean; draftName: string; canDelete: boolean;
   onSwitch: () => void; onStartRename: () => void; onChangeDraft: (s: string) => void;
   onCommitRename: () => void; onCancelRename: () => void; onRequestDelete: () => void;
+  onPatch: (patch: Partial<Page>) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: page.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.6 : 1 };
@@ -158,6 +164,7 @@ function SortablePageTab({
           <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={onStartRename} aria-label="Rename page">
             <Pencil className="size-3" />
           </Button>
+          <PageSettingsButton page={page} onChange={onPatch} />
           {canDelete && (
             <Button size="icon" variant="ghost" className="h-6 w-6 opacity-0 group-hover:opacity-100 text-destructive" onClick={onRequestDelete} aria-label="Delete page">
               <Trash2 className="size-3" />

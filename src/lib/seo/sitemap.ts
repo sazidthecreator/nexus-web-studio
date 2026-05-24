@@ -7,10 +7,15 @@ function slugify(s: string) {
 
 export function pagePaths(content: ProjectContent): { path: string; name: string }[] {
   const pages = content.pages || [];
-  return pages.map((p, i) => ({
-    name: p.name || `Page ${i + 1}`,
-    path: i === 0 ? "/" : `/${slugify(p.name || `page-${i + 1}`)}`,
-  }));
+  return pages
+    .filter((p) => !p.seo?.noindex)
+    .map((p, i) => {
+      const slug = p.slug ? slugify(p.slug) : slugify(p.name || `page-${i + 1}`);
+      return {
+        name: p.name || `Page ${i + 1}`,
+        path: i === 0 ? "/" : `/${slug}`,
+      };
+    });
 }
 
 export function buildSitemapXml(origin: string, content: ProjectContent, lastmod = new Date()) {
@@ -35,10 +40,11 @@ export function buildRobotsTxt(origin: string, sitemapPath = "/sitemap.xml") {
 // For static export — relative paths.
 export function buildSitemapXmlForExport(content: ProjectContent, lastmod = new Date()) {
   const iso = lastmod.toISOString();
-  const pages = content.pages || [];
+  const pages = (content.pages || []).filter((p) => !p.seo?.noindex);
   const urls = pages
     .map((p, i) => {
-      const file = i === 0 ? "index.html" : `${slugify(p.name || `page-${i + 1}`)}.html`;
+      const slug = p.slug ? slugify(p.slug) : slugify(p.name || `page-${i + 1}`);
+      const file = i === 0 ? "index.html" : `${slug}.html`;
       return `  <url><loc>${file}</loc><lastmod>${iso}</lastmod><priority>${i === 0 ? "1.0" : "0.7"}</priority></url>`;
     })
     .join("\n");

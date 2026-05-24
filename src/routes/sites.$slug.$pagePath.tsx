@@ -21,6 +21,10 @@ function pageSlug(name: string) {
     .replace(/^-+|-+$/g, "") || "page";
 }
 
+function effectiveSlug(p: { name: string; slug?: string }): string {
+  return p.slug ? pageSlug(p.slug) : pageSlug(p.name);
+}
+
 export const Route = createFileRoute("/sites/$slug/$pagePath")({
   validateSearch: search,
   loaderDeps: ({ search }) => ({ lang: search.lang ?? "" }),
@@ -28,7 +32,7 @@ export const Route = createFileRoute("/sites/$slug/$pagePath")({
     try {
       const data = await getPublishedSite({ data: { slug: params.slug, lang: deps.lang } });
       const pages = ((data.content as any)?.pages ?? []) as ProjectContent["pages"];
-      const idx = pages.findIndex((p) => pageSlug(p.name) === params.pagePath);
+      const idx = pages.findIndex((p) => effectiveSlug(p) === params.pagePath);
       if (idx === -1) throw notFound();
       return { ...data, pageIndex: idx };
     } catch (err: any) {
@@ -40,17 +44,23 @@ export const Route = createFileRoute("/sites/$slug/$pagePath")({
     const seo = (loaderData?.seo as any) || {};
     const content = (loaderData?.content as any) || {};
     const page = content.pages?.[loaderData?.pageIndex ?? 0];
+    const pageSeo = (page?.seo as any) || {};
     const baseTitle = seo.title || loaderData?.name || "Published site";
-    const title = page?.name ? `${page.name} — ${baseTitle}` : baseTitle;
-    const description = seo.description || "";
+    const title = pageSeo.title || (page?.name ? `${page.name} — ${baseTitle}` : baseTitle);
+    const description = pageSeo.description || seo.description || "";
+    const ogImage = pageSeo.ogImage || seo.ogImage;
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        ...(pageSeo.noindex ? [{ name: "robots", content: "noindex,nofollow" }] : []),
         { name: "theme-color", content: content?.branding?.primaryColor || "#7c5cff" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        ...(seo.ogImage ? [{ property: "og:image", content: seo.ogImage as string }] : []),
+        ...(ogImage ? [
+          { property: "og:image", content: ogImage as string },
+          { name: "twitter:image", content: ogImage as string },
+        ] : []),
       ],
     };
   },

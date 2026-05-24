@@ -34,9 +34,32 @@ export type Branding = {
   typographyPreset?: string;
 };
 
+export type PageSEO = {
+  /** Override <title>. Falls back to "<page.name> — <site title>". */
+  title?: string;
+  /** Override <meta name="description">. Falls back to site SEO description. */
+  description?: string;
+  /** Override og:image / twitter:image. */
+  ogImage?: string;
+  /** Hide from generated nav pickers / sitemaps when true. */
+  noindex?: boolean;
+};
+
+export type ProjectPage = {
+  id: string;
+  name: string;
+  blocks: Block[];
+  /** Optional URL slug override. When unset, derived from name. */
+  slug?: string;
+  /** Hide from auto-generated nav links. */
+  hiddenFromNav?: boolean;
+  /** Per-page SEO overrides — merged on top of site-level SEO. */
+  seo?: PageSEO;
+};
+
 export type ProjectContent = {
   branding: Branding;
-  pages: { id: string; name: string; blocks: Block[] }[];
+  pages: ProjectPage[];
 };
 
 export const FONTS = [

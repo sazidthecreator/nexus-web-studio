@@ -3,12 +3,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
-import type { Block } from "@/lib/blocks";
+import type { Block, ProjectPage } from "@/lib/blocks";
 import { AssetPicker } from "./asset-picker";
+import { pageSlug } from "@/components/editor/page-settings";
 
 type Props = {
   block: Block;
   onChange: (patch: Record<string, any>) => void;
+  /** When provided, href fields show a "link to page" picker. */
+  pages?: Pick<ProjectPage, "id" | "name" | "slug">[];
 };
 
 function Field({ label, value, onChange, multiline }: { label: string; value: any; onChange: (v: string) => void; multiline?: boolean }) {
@@ -24,10 +27,10 @@ function Field({ label, value, onChange, multiline }: { label: string; value: an
   );
 }
 
-export function PropertyEditor({ block, onChange }: Props) {
+export function PropertyEditor({ block, onChange, pages }: Props) {
   const p = block.props;
   const set = (k: string, v: any) => onChange({ [k]: v });
-  const inner = renderTypeFields(block, p, set);
+  const inner = renderTypeFields(block, p, set, pages);
   return (
     <div className="space-y-4">
       {inner}
@@ -44,20 +47,60 @@ export function PropertyEditor({ block, onChange }: Props) {
   );
 }
 
-function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any) => void) {
+function pageHref(p: Pick<ProjectPage, "name" | "slug">, isFirst: boolean): string {
+  if (isFirst) return "/";
+  return `/${p.slug ? pageSlug(p.slug) : pageSlug(p.name)}`;
+}
+
+function PagePicker({
+  pages,
+  onPick,
+}: {
+  pages: Pick<ProjectPage, "id" | "name" | "slug">[];
+  onPick: (href: string) => void;
+}) {
+  if (!pages || pages.length === 0) return null;
+  return (
+    <select
+      aria-label="Link to a page"
+      value=""
+      onChange={(e) => {
+        if (!e.target.value) return;
+        onPick(e.target.value);
+        e.target.value = "";
+      }}
+      className="h-9 rounded-md border border-input bg-background px-2 text-xs"
+      title="Link to a page in this project"
+    >
+      <option value="">↗ Link to page…</option>
+      {pages.map((pg, i) => (
+        <option key={pg.id} value={pageHref(pg, i === 0)}>
+          {pg.name}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any) => void, pages?: Pick<ProjectPage, "id" | "name" | "slug">[]) {
   switch (block.type) {
     case "navbar":
       return (
         <div className="space-y-3">
           <SelectField label="Layout" value={p.layout ?? "split"} options={["split", "center", "stacked", "minimal"]} onChange={(v) => set("layout", v)} />
           <Field label="CTA label" value={p.ctaLabel} onChange={(v) => set("ctaLabel", v)} />
-          <Field label="CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1"><Field label="CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} /></div>
+            <PagePicker pages={pages ?? []} onPick={(href) => set("ctaHref", href)} />
+          </div>
           <ListEditor
             label="Links"
             items={p.links || []}
             fields={["label", "href"]}
             empty={{ label: "New link", href: "#" }}
             onChange={(items) => set("links", items)}
+            pages={pages}
+            hrefField="href"
           />
         </div>
       );
@@ -69,9 +112,15 @@ function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any
           <Field label="Headline" value={p.headline} onChange={(v) => set("headline", v)} multiline />
           <Field label="Subheadline" value={p.subheadline} onChange={(v) => set("subheadline", v)} multiline />
           <Field label="Primary CTA label" value={p.ctaLabel} onChange={(v) => set("ctaLabel", v)} />
-          <Field label="Primary CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1"><Field label="Primary CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} /></div>
+            <PagePicker pages={pages ?? []} onPick={(href) => set("ctaHref", href)} />
+          </div>
           <Field label="Secondary CTA label" value={p.secondaryLabel} onChange={(v) => set("secondaryLabel", v)} />
-          <Field label="Secondary CTA href" value={p.secondaryHref} onChange={(v) => set("secondaryHref", v)} />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1"><Field label="Secondary CTA href" value={p.secondaryHref} onChange={(v) => set("secondaryHref", v)} /></div>
+            <PagePicker pages={pages ?? []} onPick={(href) => set("secondaryHref", href)} />
+          </div>
         </div>
       );
     case "features":
@@ -96,7 +145,10 @@ function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any
           <Field label="Headline" value={p.headline} onChange={(v) => set("headline", v)} multiline />
           <Field label="Subheadline" value={p.subheadline} onChange={(v) => set("subheadline", v)} multiline />
           <Field label="CTA label" value={p.ctaLabel} onChange={(v) => set("ctaLabel", v)} />
-          <Field label="CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1"><Field label="CTA href" value={p.ctaHref} onChange={(v) => set("ctaHref", v)} /></div>
+            <PagePicker pages={pages ?? []} onPick={(href) => set("ctaHref", href)} />
+          </div>
         </div>
       );
     case "footer":
@@ -165,7 +217,10 @@ function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any
       return (
         <div className="space-y-3">
           <Field label="Label" value={p.label} onChange={(v) => set("label", v)} />
-          <Field label="Link (href)" value={p.href} onChange={(v) => set("href", v)} />
+          <div className="flex gap-2 items-end">
+            <div className="flex-1"><Field label="Link (href)" value={p.href} onChange={(v) => set("href", v)} /></div>
+            <PagePicker pages={pages ?? []} onPick={(href) => set("href", href)} />
+          </div>
           <SelectField label="Style" value={p.style ?? "solid"} options={["solid", "outline"]} onChange={(v) => set("style", v)} />
           <SelectField label="Align" value={p.align ?? "center"} options={["left", "center", "right"]} onChange={(v) => set("align", v)} />
         </div>
@@ -252,7 +307,7 @@ function NumField({ label, value, onChange }: { label: string; value: number; on
   );
 }
 
-function ListEditor({ label, items, fields, empty, onChange }: { label: string; items: any[]; fields: string[]; empty: any; onChange: (items: any[]) => void }) {
+function ListEditor({ label, items, fields, empty, onChange, pages, hrefField }: { label: string; items: any[]; fields: string[]; empty: any; onChange: (items: any[]) => void; pages?: Pick<ProjectPage, "id" | "name" | "slug">[]; hrefField?: string }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -278,6 +333,14 @@ function ListEditor({ label, items, fields, empty, onChange }: { label: string; 
                 onChange={(e) => onChange(items.map((x, j) => (j === i ? { ...x, [f]: e.target.value } : x)))}
               />
             ))}
+            {hrefField && pages && pages.length > 0 && (
+              <PagePicker
+                pages={pages}
+                onPick={(href) =>
+                  onChange(items.map((x, j) => (j === i ? { ...x, [hrefField]: href } : x)))
+                }
+              />
+            )}
           </div>
         ))}
       </div>
