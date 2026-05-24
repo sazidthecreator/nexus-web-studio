@@ -55,6 +55,8 @@ import { SeoPanel } from "@/components/editor/seo-panel";
 import { WriterAssistant } from "@/components/editor/writer-assistant";
 import { ConflictDialog, type ConflictChoice } from "@/components/editor/conflict-dialog";
 import { PublishDialog } from "@/components/editor/publish-dialog";
+import { BlogPanel } from "@/components/editor/blog-panel";
+
 import { VersionHistory } from "@/components/editor/version-history";
 import { CustomCodePanel } from "@/components/editor/custom-code";
 import { HealthBadge, HealthPanel, useHealth } from "@/components/editor/health-panel";
@@ -64,7 +66,7 @@ import { TranslatePanel } from "@/components/editor/translate-panel";
 import { CommentsPanel } from "@/components/editor/comments-panel";
 import { PresenceBar } from "@/components/editor/presence-bar";
 import { Inbox, Languages, MessageSquare } from "lucide-react";
-import { Globe, History as HistoryIcon } from "lucide-react";
+import { Globe, History as HistoryIcon, FileText } from "lucide-react";
 import { AiProviderChip } from "@/components/editor/ai-provider-chip";
 import { PagesBar } from "@/components/editor/pages-bar";
 
@@ -183,6 +185,8 @@ function EditorPage() {
   const [devtoolsOpen, setDevtoolsOpen] = useState(false);
   const [seoOpen, setSeoOpen] = useState(false);
   const [publishOpen, setPublishOpen] = useState(false);
+  const [blogOpen, setBlogOpen] = useState(false);
+
   const [historyOpen, setHistoryOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [healthOpen, setHealthOpen] = useState(false);
@@ -878,6 +882,10 @@ function EditorPage() {
             <Button size="icon" variant="ghost" onClick={() => setCodeOpen(true)} title="Custom code" aria-label="Custom code">
               <Code2 className="size-4" />
             </Button>
+            <Button size="sm" variant="ghost" onClick={() => setBlogOpen(true)} title="Blog & CMS">
+              <FileText className="size-4" /> Blog
+            </Button>
+
             <Button onClick={() => save.mutate()} disabled={save.isPending} size="sm" variant="ghost">
               <Save className="size-4" /> {save.isPending ? "Saving…" : "Save"}
             </Button>
@@ -1152,6 +1160,16 @@ function EditorPage() {
           seo={(project as any).seo}
         />
       )}
+      {project && (
+        <BlogPanel
+          open={blogOpen}
+          onOpenChange={setBlogOpen}
+          projectId={projectId}
+          projectSlug={(project as any).slug ?? null}
+          projectPublished={!!project.published}
+        />
+      )}
+
       <VersionHistory
         open={historyOpen}
         onOpenChange={setHistoryOpen}

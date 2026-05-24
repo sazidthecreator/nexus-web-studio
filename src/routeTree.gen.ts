@@ -20,9 +20,11 @@ import { Route as AuthenticatedFocusRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedBrandKitRouteImport } from './routes/_authenticated/brand-kit'
 import { Route as AuthenticatedAiKeysRouteImport } from './routes/_authenticated/ai-keys'
+import { Route as SitesSlugBlogRouteImport } from './routes/sites.$slug.blog'
 import { Route as SitesSlugPagePathRouteImport } from './routes/sites.$slug.$pagePath'
 import { Route as ApiPublicPvRouteImport } from './routes/api/public/pv'
 import { Route as AuthenticatedEditorProjectIdRouteImport } from './routes/_authenticated/editor.$projectId'
+import { Route as SitesSlugBlogPostSlugRouteImport } from './routes/sites.$slug.blog.$postSlug'
 import { Route as ApiPublicFormsSubmitRouteImport } from './routes/api/public/forms.submit'
 import { Route as ApiPublicSitesSlugSitemap_xmlRouteImport } from './routes/api/public/sites.$slug.sitemap_xml'
 import { Route as ApiPublicSitesSlugRobots_txtRouteImport } from './routes/api/public/sites.$slug.robots_txt'
@@ -82,6 +84,11 @@ const AuthenticatedAiKeysRoute = AuthenticatedAiKeysRouteImport.update({
   path: '/ai-keys',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const SitesSlugBlogRoute = SitesSlugBlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
+  getParentRoute: () => SitesSlugRoute,
+} as any)
 const SitesSlugPagePathRoute = SitesSlugPagePathRouteImport.update({
   id: '/$pagePath',
   path: '/$pagePath',
@@ -98,6 +105,11 @@ const AuthenticatedEditorProjectIdRoute =
     path: '/editor/$projectId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const SitesSlugBlogPostSlugRoute = SitesSlugBlogPostSlugRouteImport.update({
+  id: '/$postSlug',
+  path: '/$postSlug',
+  getParentRoute: () => SitesSlugBlogRoute,
+} as any)
 const ApiPublicFormsSubmitRoute = ApiPublicFormsSubmitRouteImport.update({
   id: '/api/public/forms/submit',
   path: '/api/public/forms/submit',
@@ -136,7 +148,9 @@ export interface FileRoutesByFullPath {
   '/editor/$projectId': typeof AuthenticatedEditorProjectIdRoute
   '/api/public/pv': typeof ApiPublicPvRoute
   '/sites/$slug/$pagePath': typeof SitesSlugPagePathRoute
+  '/sites/$slug/blog': typeof SitesSlugBlogRouteWithChildren
   '/api/public/forms/submit': typeof ApiPublicFormsSubmitRoute
+  '/sites/$slug/blog/$postSlug': typeof SitesSlugBlogPostSlugRoute
   '/api/public/sites/$slug/manifest_webmanifest': typeof ApiPublicSitesSlugManifest_webmanifestRoute
   '/api/public/sites/$slug/robots_txt': typeof ApiPublicSitesSlugRobots_txtRoute
   '/api/public/sites/$slug/sitemap_xml': typeof ApiPublicSitesSlugSitemap_xmlRoute
@@ -155,7 +169,9 @@ export interface FileRoutesByTo {
   '/editor/$projectId': typeof AuthenticatedEditorProjectIdRoute
   '/api/public/pv': typeof ApiPublicPvRoute
   '/sites/$slug/$pagePath': typeof SitesSlugPagePathRoute
+  '/sites/$slug/blog': typeof SitesSlugBlogRouteWithChildren
   '/api/public/forms/submit': typeof ApiPublicFormsSubmitRoute
+  '/sites/$slug/blog/$postSlug': typeof SitesSlugBlogPostSlugRoute
   '/api/public/sites/$slug/manifest_webmanifest': typeof ApiPublicSitesSlugManifest_webmanifestRoute
   '/api/public/sites/$slug/robots_txt': typeof ApiPublicSitesSlugRobots_txtRoute
   '/api/public/sites/$slug/sitemap_xml': typeof ApiPublicSitesSlugSitemap_xmlRoute
@@ -176,7 +192,9 @@ export interface FileRoutesById {
   '/_authenticated/editor/$projectId': typeof AuthenticatedEditorProjectIdRoute
   '/api/public/pv': typeof ApiPublicPvRoute
   '/sites/$slug/$pagePath': typeof SitesSlugPagePathRoute
+  '/sites/$slug/blog': typeof SitesSlugBlogRouteWithChildren
   '/api/public/forms/submit': typeof ApiPublicFormsSubmitRoute
+  '/sites/$slug/blog/$postSlug': typeof SitesSlugBlogPostSlugRoute
   '/api/public/sites/$slug/manifest_webmanifest': typeof ApiPublicSitesSlugManifest_webmanifestRoute
   '/api/public/sites/$slug/robots_txt': typeof ApiPublicSitesSlugRobots_txtRoute
   '/api/public/sites/$slug/sitemap_xml': typeof ApiPublicSitesSlugSitemap_xmlRoute
@@ -197,7 +215,9 @@ export interface FileRouteTypes {
     | '/editor/$projectId'
     | '/api/public/pv'
     | '/sites/$slug/$pagePath'
+    | '/sites/$slug/blog'
     | '/api/public/forms/submit'
+    | '/sites/$slug/blog/$postSlug'
     | '/api/public/sites/$slug/manifest_webmanifest'
     | '/api/public/sites/$slug/robots_txt'
     | '/api/public/sites/$slug/sitemap_xml'
@@ -216,7 +236,9 @@ export interface FileRouteTypes {
     | '/editor/$projectId'
     | '/api/public/pv'
     | '/sites/$slug/$pagePath'
+    | '/sites/$slug/blog'
     | '/api/public/forms/submit'
+    | '/sites/$slug/blog/$postSlug'
     | '/api/public/sites/$slug/manifest_webmanifest'
     | '/api/public/sites/$slug/robots_txt'
     | '/api/public/sites/$slug/sitemap_xml'
@@ -236,7 +258,9 @@ export interface FileRouteTypes {
     | '/_authenticated/editor/$projectId'
     | '/api/public/pv'
     | '/sites/$slug/$pagePath'
+    | '/sites/$slug/blog'
     | '/api/public/forms/submit'
+    | '/sites/$slug/blog/$postSlug'
     | '/api/public/sites/$slug/manifest_webmanifest'
     | '/api/public/sites/$slug/robots_txt'
     | '/api/public/sites/$slug/sitemap_xml'
@@ -335,6 +359,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAiKeysRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/sites/$slug/blog': {
+      id: '/sites/$slug/blog'
+      path: '/blog'
+      fullPath: '/sites/$slug/blog'
+      preLoaderRoute: typeof SitesSlugBlogRouteImport
+      parentRoute: typeof SitesSlugRoute
+    }
     '/sites/$slug/$pagePath': {
       id: '/sites/$slug/$pagePath'
       path: '/$pagePath'
@@ -355,6 +386,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/editor/$projectId'
       preLoaderRoute: typeof AuthenticatedEditorProjectIdRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/sites/$slug/blog/$postSlug': {
+      id: '/sites/$slug/blog/$postSlug'
+      path: '/$postSlug'
+      fullPath: '/sites/$slug/blog/$postSlug'
+      preLoaderRoute: typeof SitesSlugBlogPostSlugRouteImport
+      parentRoute: typeof SitesSlugBlogRoute
     }
     '/api/public/forms/submit': {
       id: '/api/public/forms/submit'
@@ -409,12 +447,26 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface SitesSlugBlogRouteChildren {
+  SitesSlugBlogPostSlugRoute: typeof SitesSlugBlogPostSlugRoute
+}
+
+const SitesSlugBlogRouteChildren: SitesSlugBlogRouteChildren = {
+  SitesSlugBlogPostSlugRoute: SitesSlugBlogPostSlugRoute,
+}
+
+const SitesSlugBlogRouteWithChildren = SitesSlugBlogRoute._addFileChildren(
+  SitesSlugBlogRouteChildren,
+)
+
 interface SitesSlugRouteChildren {
   SitesSlugPagePathRoute: typeof SitesSlugPagePathRoute
+  SitesSlugBlogRoute: typeof SitesSlugBlogRouteWithChildren
 }
 
 const SitesSlugRouteChildren: SitesSlugRouteChildren = {
   SitesSlugPagePathRoute: SitesSlugPagePathRoute,
+  SitesSlugBlogRoute: SitesSlugBlogRouteWithChildren,
 }
 
 const SitesSlugRouteWithChildren = SitesSlugRoute._addFileChildren(
