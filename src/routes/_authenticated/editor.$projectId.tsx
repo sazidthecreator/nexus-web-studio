@@ -1160,6 +1160,16 @@ function EditorPage() {
           seo={(project as any).seo}
         />
       )}
+      {project && (
+        <BlogPanel
+          open={blogOpen}
+          onOpenChange={setBlogOpen}
+          projectId={projectId}
+          projectSlug={(project as any).slug ?? null}
+          projectPublished={!!project.published}
+        />
+      )}
+
       <VersionHistory
         open={historyOpen}
         onOpenChange={setHistoryOpen}
