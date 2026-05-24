@@ -32,7 +32,9 @@ export function PublishDialog({
   const [previewEnabled, setPreviewEnabled] = useState(true);
   const [busy, setBusy] = useState(false);
   const checklist = useMemo(() => runPrePublishChecklist(content, seo), [content, seo]);
-  const hasFailures = checklist.some((c) => c.status === "fail");
+  const failures = checklist.filter((c) => c.status === "fail");
+  const hasFailures = failures.length > 0;
+
 
   useEffect(() => {
     if (!open) return;
