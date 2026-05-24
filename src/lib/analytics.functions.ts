@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({
   projectId: z.string().uuid(),
-  days: z.number().int().min(1).max(90).default(30),
+  days: z.union([z.literal(7), z.literal(30), z.literal(90)]).default(30),
 });
 
 export const getProjectAnalytics = createServerFn({ method: "POST" })
@@ -20,17 +20,34 @@ export const getProjectAnalytics = createServerFn({ method: "POST" })
       .eq("id", data.projectId)
       .maybeSingle();
     if (!proj || proj.user_id !== userId) {
-      return { daily: [], topPaths: [], totalViews: 0, uniqueVisitors: 0 };
+      return {
+        daily: [], topPaths: [], totalViews: 0, uniqueVisitors: 0,
+        formSubmissions: 0, vitals: [],
+      };
     }
 
     const since = new Date(Date.now() - data.days * 86400_000).toISOString();
-    const { data: rows } = await supabase
-      .from("page_views")
-      .select("ts, page_path, visitor_hash")
-      .eq("project_id", data.projectId)
-      .gte("ts", since)
-      .order("ts", { ascending: true })
-      .limit(10000);
+    const [pvRes, formRes, vitalsRes] = await Promise.all([
+      supabase
+        .from("page_views")
+        .select("ts, page_path, visitor_hash")
+        .eq("project_id", data.projectId)
+        .gte("ts", since)
+        .order("ts", { ascending: true })
+        .limit(10000),
+      supabase
+        .from("form_responses")
+        .select("id", { count: "exact", head: true })
+        .eq("project_id", data.projectId)
+        .gte("created_at", since),
+      supabase
+        .from("vitals_reports")
+        .select("name, value, rating")
+        .eq("project_id", data.projectId)
+        .gte("created_at", since)
+        .limit(2000),
+    ]);
+    const rows = pvRes.data;
 
     const dailyMap = new Map<string, { day: string; views: number; visitors: Set<string> }>();
     const pathMap = new Map<string, number>();
@@ -56,10 +73,29 @@ export const getProjectAnalytics = createServerFn({ method: "POST" })
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
+    // Median per vital metric (LCP, CLS, INP, FCP, TTFB)
+    const vitalBuckets = new Map<string, { values: number[]; good: number; total: number }>();
+    for (const v of vitalsRes.data ?? []) {
+      const name = (v.name as string) || "";
+      if (!name) continue;
+      const b = vitalBuckets.get(name) ?? { values: [], good: 0, total: 0 };
+      b.values.push(Number(v.value));
+      b.total += 1;
+      if (v.rating === "good") b.good += 1;
+      vitalBuckets.set(name, b);
+    }
+    const vitals = Array.from(vitalBuckets.entries()).map(([name, b]) => {
+      const sorted = b.values.slice().sort((a, c) => a - c);
+      const median = sorted.length ? sorted[Math.floor(sorted.length / 2)] : 0;
+      return { name, median, goodPct: b.total ? Math.round((b.good / b.total) * 100) : 0, samples: b.total };
+    }).sort((a, c) => a.name.localeCompare(c.name));
+
     return {
       daily,
       topPaths,
       totalViews: rows?.length ?? 0,
       uniqueVisitors: allVisitors.size,
+      formSubmissions: formRes.count ?? 0,
+      vitals,
     };
   });
