@@ -27,9 +27,13 @@ export const Route = createFileRoute("/sites/$slug")({
   },
   head: ({ loaderData }) => {
     const seo = (loaderData?.seo as any) || {};
-    const title = seo.title || loaderData?.name || "Published site";
-    const description = seo.description || "";
     const content = (loaderData?.content as any) || {};
+    const firstPage = content.pages?.[0];
+    const pageSeo = (firstPage?.seo as any) || {};
+    const siteTitle = seo.title || loaderData?.name || "Published site";
+    const title = pageSeo.title || siteTitle;
+    const description = pageSeo.description || seo.description || "";
+    const ogImage = pageSeo.ogImage || seo.ogImage;
     const websiteLd = {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -47,10 +51,14 @@ export const Route = createFileRoute("/sites/$slug")({
       meta: [
         { title },
         { name: "description", content: description },
+        ...(pageSeo.noindex ? [{ name: "robots", content: "noindex,nofollow" }] : []),
         { name: "theme-color", content: content?.branding?.primaryColor || "#7c5cff" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        ...(seo.ogImage ? [{ property: "og:image", content: seo.ogImage as string }] : []),
+        ...(ogImage ? [
+          { property: "og:image", content: ogImage as string },
+          { name: "twitter:image", content: ogImage as string },
+        ] : []),
       ],
       links: [
         ...hreflangs,
