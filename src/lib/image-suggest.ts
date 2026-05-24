@@ -1,7 +1,7 @@
 // AI-powered Unsplash query suggestion based on block context.
 // Uses the existing Lovable AI Gateway via the project's `invokeLLM` helper.
 
-import { invokeLLM } from "@/server/_core/llm";
+import { callAi } from "./ai-gateway";
 
 export async function suggestImageQuery(
   blockType: string,
