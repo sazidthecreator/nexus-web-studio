@@ -187,7 +187,7 @@ export function CreateProjectWizard({ open, onOpenChange, initial }: Props) {
         }
       }
 
-      // 4. Insert
+      // 4. Insert (slug is reserved at publish time, not creation — avoids unique conflicts)
       const { data, error } = await supabase
         .from("projects")
         .insert({
@@ -195,11 +195,11 @@ export function CreateProjectWizard({ open, onOpenChange, initial }: Props) {
           name: name.trim() || (importedTpl?.name ?? selectedTpl.name),
           description: description.trim() || null,
           template_id: templateId,
-          slug: slug || null,
           content: content as any,
         })
         .select("id")
         .single();
+
       if (error) throw error;
       return data.id as string;
     },
