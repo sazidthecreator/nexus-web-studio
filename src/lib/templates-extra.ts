@@ -310,3 +310,58 @@ export const musicArtist = (): ProjectContent => ({
     blk("footer", { tagline: "© Nadia Cole · Booking: hello@nadiacole.com", columns: [{ title: "Follow", links: [{ label: "Spotify", href: "#" }, { label: "Apple Music", href: "#" }, { label: "Instagram", href: "#" }] }] }),
   ]),
 });
+
+export const saasPricing = (): ProjectContent => ({
+  branding: { siteName: "Linear Flow", primaryColor: "#6366f1", fontFamily: "Inter, system-ui, sans-serif" },
+  pages: homePage([
+    blk("navbar", { links: [{ label: "Features", href: "#features" }, { label: "Pricing", href: "#pricing" }, { label: "Docs", href: "#docs" }], ctaLabel: "Start free trial", ctaHref: "#signup" }),
+    blk("hero", { eyebrow: "Simple, transparent pricing", headline: "Pick the plan that fits your team.", subheadline: "All plans include unlimited projects, SSO, and 99.99% uptime. Switch or cancel any time.", ctaLabel: "Start 14-day free trial", ctaHref: "#signup", secondaryLabel: "Talk to sales", secondaryHref: "#sales" }),
+    blk("features", { title: "Three plans, no surprises", subtitle: "Per seat, billed annually. 20% off vs monthly.", items: [
+      { icon: "Starter", title: "$12 / seat / mo", body: "Up to 10 seats · core workflow · email support · 30-day history" },
+      { icon: "Growth", title: "$24 / seat / mo", body: "Unlimited seats · automations · SSO · priority support · 1-year history" },
+      { icon: "Enterprise", title: "Custom", body: "SAML · audit log · DPA · dedicated CSM · SLA · custom retention" },
+    ]}),
+    blk("cta", { headline: "Try every feature free for 14 days", subheadline: "No credit card required. Full access. Cancel in one click.", ctaLabel: "Create your workspace", ctaHref: "#signup" }),
+    blk("footer", { tagline: "Linear Flow · SOC 2 Type II · GDPR-ready", columns: [{ title: "Product", links: [{ label: "Changelog", href: "#" }, { label: "Status", href: "#" }, { label: "Security", href: "#" }] }] }),
+  ]),
+});
+
+export const jobBoard = (): ProjectContent => ({
+  branding: { siteName: "Hire Remote", primaryColor: "#0f172a", fontFamily: "'DM Sans', sans-serif" },
+  pages: homePage([
+    blk("navbar", { links: [{ label: "Jobs", href: "#jobs" }, { label: "Companies", href: "#co" }, { label: "Salaries", href: "#salaries" }], ctaLabel: "Post a job", ctaHref: "#post" }),
+    blk("hero", { eyebrow: "2,400+ live roles · updated hourly", headline: "Remote-first jobs at companies that mean it.", subheadline: "Curated engineering, design, and product roles from teams with mature remote cultures. No 'remote (US only)' nonsense.", ctaLabel: "Browse all jobs", ctaHref: "#jobs", secondaryLabel: "Weekly digest", secondaryHref: "#digest" }),
+    blk("features", { title: "Featured this week", subtitle: "Hand-picked roles from teams we trust.", items: [
+      { icon: "Linear", title: "Senior Product Engineer", body: "Remote (worldwide) · $180-240k · Full-time" },
+      { icon: "Vercel", title: "Staff Designer, Platform", body: "Remote (EU / Americas) · $200-260k · Full-time" },
+      { icon: "Supabase", title: "Developer Relations Lead", body: "Remote (worldwide) · $160-210k · Full-time" },
+    ]}),
+    blk("form", { title: "Get the weekly digest", subtitle: "Top 10 remote roles every Monday. 18,000 readers.", submitLabel: "Subscribe", fields: [{ name: "email", label: "Email", type: "email", required: true }] }),
+    blk("footer", { tagline: "Hire Remote · Made in Lisbon · since 2021", columns: [{ title: "Employers", links: [{ label: "Post a job ($299)", href: "#" }, { label: "Featured listing", href: "#" }] }] }),
+  ]),
+});
+
+export const marketplace = (): ProjectContent => ({
+  branding: { siteName: "Folkside", primaryColor: "#0d9488", fontFamily: "'Space Grotesk', sans-serif" },
+  pages: homePage([
+    blk("navbar", { links: [{ label: "Browse", href: "#browse" }, { label: "Categories", href: "#cat" }, { label: "Sell", href: "#sell" }], ctaLabel: "Sign in", ctaHref: "#signin" }),
+    blk("hero", { eyebrow: "12,400 independent makers · 86 countries", headline: "A marketplace for things made by hand.", subheadline: "Ceramics, textiles, woodwork, jewellery — bought directly from the people who make them. No middlemen, no mass production.", ctaLabel: "Start browsing", ctaHref: "#browse", secondaryLabel: "Become a seller", secondaryHref: "#sell" }),
+    blk("features", { title: "How Folkside works", subtitle: "Same flow for buyers and sellers — simple and fair.", items: [
+      { icon: "01", title: "Discover", body: "Browse curated categories or search by maker, material, or region." },
+      { icon: "02", title: "Order direct", body: "Buy straight from the maker. We handle payments, you handle the conversation." },
+      { icon: "03", title: "Receive & review", body: "Shipped within 5 days. Reviews stay with the maker, not us." },
+    ]}),
+    blk("cta", { headline: "Sell on Folkside — 8% flat fee, no listing costs", subheadline: "Open a shop in 10 minutes. Get paid weekly. Keep your customer relationship.", ctaLabel: "Open a shop", ctaHref: "#sell" }),
+    blk("footer", { tagline: "Folkside · Supporting independent makers since 2019", columns: [{ title: "Trust", links: [{ label: "Buyer protection", href: "#" }, { label: "Maker code", href: "#" }, { label: "Shipping", href: "#" }] }] }),
+  ]),
+});
+
+export const comingSoon = (): ProjectContent => ({
+  branding: { siteName: "Aurelia", primaryColor: "#0f172a", fontFamily: "'Playfair Display', Georgia, serif" },
+  pages: homePage([
+    blk("hero", { eyebrow: "Launching Q3 2026", headline: "Something quietly extraordinary is on the way.", subheadline: "We're building Aurelia in stealth. Leave your email and you'll be the first to know — and the first to try it.", ctaLabel: "", ctaHref: "" }),
+    blk("form", { title: "Join the waitlist", subtitle: "No spam. One email when we open the doors. That's it.", submitLabel: "Notify me", fields: [{ name: "email", label: "Email address", type: "email", required: true }] }),
+    blk("text", { body: "Built in Copenhagen by a small team obsessed with craft. Backed by a handful of investors who get it.", align: "center" }),
+    blk("footer", { tagline: "© Aurelia · hello@aurelia.studio", columns: [] }),
+  ]),
+});
