@@ -290,13 +290,20 @@ function DashboardPage() {
       <CreateProjectWizard open={createOpen} onOpenChange={setCreateOpen} initial={onboarding ?? undefined} />
       <OnboardingWizard
         open={onboardOpen}
-        onOpenChange={setOnboardOpen}
+        onOpenChange={(v) => {
+          setOnboardOpen(v);
+          // Persist dismissal so the wizard doesn't re-open on every dashboard visit.
+          if (!v) {
+            try { if (!localStorage.getItem("sitely:onboarded")) localStorage.setItem("sitely:onboarded", JSON.stringify({ at: Date.now(), dismissed: true })); } catch {}
+          }
+        }}
         onComplete={(r) => {
           setOnboarding(r);
           if (r.start === "template") navigate({ to: "/templates" });
           else setCreateOpen(true);
         }}
       />
+
     </div>
   );
 }
