@@ -18,11 +18,15 @@ Suggest a single Unsplash search query (3-5 words) for a fitting background/feat
 Respond with ONLY the query, nothing else.`;
 
   try {
-    const response = await invokeLLM({
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 20,
+    const response = await callAi<{ text?: string } | string>({
+      task: "generate_copy",
+      payload: { prompt, max_tokens: 20 },
     });
-    return String(response || "")
+    const text =
+      typeof response.result === "string"
+        ? response.result
+        : (response.result as { text?: string })?.text || "";
+    return String(text)
       .trim()
       .toLowerCase()
       .replace(/^["']|["']$/g, "")
