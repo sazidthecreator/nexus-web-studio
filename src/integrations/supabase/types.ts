@@ -545,6 +545,39 @@ export type Database = {
         }
         Relationships: []
       }
+      vitals_reports: {
+        Row: {
+          created_at: string
+          id: number
+          name: string
+          project_id: string
+          rating: string
+          ts: number
+          url: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name: string
+          project_id: string
+          rating: string
+          ts: number
+          url: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string
+          project_id?: string
+          rating?: string
+          ts?: number
+          url?: string
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
