@@ -6,6 +6,7 @@ import {
   medicalClinic, legalFirm, weddingInvite, appLaunchMobile, resumePersonal,
   docsKnowledgeBase, podcastShow,
   fitnessGym, cryptoWeb3, aiStartup, travelBooking, musicArtist,
+  saasPricing, jobBoard, marketplace, comingSoon,
 } from "./templates-extra";
 
 export type TemplateCategory =
@@ -33,7 +34,10 @@ export type TemplateCategory =
   | "Web3"
   | "AI"
   | "Travel"
-  | "Music";
+  | "Music"
+  | "Jobs"
+  | "Marketplace"
+  | "Coming Soon";
 
 export type Template = {
   id: string;
@@ -66,6 +70,10 @@ const EXTRA_TEMPLATES: Template[] = [
   { id: "ai-startup", name: "AI Startup", description: "Private-beta AI product with waitlist.", category: "AI", thumbnailGradient: "linear-gradient(135deg,#0f172a,#6366f1)", branding: { siteName: "Synapse", primaryColor: "#0f172a", fontFamily: "Inter, system-ui, sans-serif" }, buildContent: aiStartup },
   { id: "travel-booking", name: "Travel & Tours", description: "Boutique small-group travel operator.", category: "Travel", thumbnailGradient: "linear-gradient(135deg,#0d9488,#fbbf24)", branding: { siteName: "Far & Wise", primaryColor: "#0d9488", fontFamily: "'Playfair Display', Georgia, serif" }, buildContent: travelBooking },
   { id: "music-artist", name: "Music Artist", description: "Album release + tour site for a musician.", category: "Music", thumbnailGradient: "linear-gradient(135deg,#7c2d12,#f97316)", branding: { siteName: "Nadia Cole", primaryColor: "#7c2d12", fontFamily: "'Space Grotesk', sans-serif" }, buildContent: musicArtist },
+  { id: "saas-pricing", name: "SaaS Pricing", description: "Three-tier SaaS pricing page with free trial.", category: "SaaS", thumbnailGradient: "linear-gradient(135deg,#6366f1,#a78bfa)", branding: { siteName: "Linear Flow", primaryColor: "#6366f1", fontFamily: "Inter, system-ui, sans-serif" }, buildContent: saasPricing },
+  { id: "job-board", name: "Job Board", description: "Curated remote-job board with weekly digest.", category: "Jobs", thumbnailGradient: "linear-gradient(135deg,#0f172a,#475569)", branding: { siteName: "Hire Remote", primaryColor: "#0f172a", fontFamily: "'DM Sans', sans-serif" }, buildContent: jobBoard },
+  { id: "marketplace", name: "Marketplace", description: "Two-sided marketplace for independent makers.", category: "Marketplace", thumbnailGradient: "linear-gradient(135deg,#0d9488,#5eead4)", branding: { siteName: "Folkside", primaryColor: "#0d9488", fontFamily: "'Space Grotesk', sans-serif" }, buildContent: marketplace },
+  { id: "coming-soon", name: "Coming Soon", description: "Minimalist waitlist / pre-launch page.", category: "Coming Soon", thumbnailGradient: "linear-gradient(135deg,#0f172a,#94a3b8)", branding: { siteName: "Aurelia", primaryColor: "#0f172a", fontFamily: "'Playfair Display', Georgia, serif" }, buildContent: comingSoon },
 ];
 
 // Helper to create a fully-customized block with given props.
