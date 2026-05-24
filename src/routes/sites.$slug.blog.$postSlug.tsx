@@ -27,12 +27,12 @@ export const Route = createFileRoute("/sites/$slug/blog/$postSlug")({
     };
   },
   notFoundComponent: () => (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-dvh flex items-center justify-center">
       <p className="text-muted-foreground">Post not found.</p>
     </div>
   ),
   errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-dvh flex items-center justify-center">
       <p className="text-destructive">{error.message}</p>
     </div>
   ),
@@ -43,7 +43,7 @@ function PostPage() {
   const { project, post } = Route.useLoaderData();
   const html = useMemo(() => renderMarkdown(post.body || ""), [post.body]);
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-dvh bg-background text-foreground">
       <header className="border-b">
         <div className="container mx-auto max-w-3xl px-6 py-6 flex items-center justify-between">
           <Link to="/sites/$slug/blog" params={{ slug: project.slug! }} className="text-sm text-muted-foreground hover:text-foreground">

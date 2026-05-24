@@ -55,7 +55,7 @@ export const Route = createFileRoute("/sites/$slug/$pagePath")({
     };
   },
   notFoundComponent: () => (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-dvh flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-3xl font-bold">Page not found</h1>
         <p className="text-muted-foreground mt-2">This page does not exist on this site.</p>
@@ -63,7 +63,7 @@ export const Route = createFileRoute("/sites/$slug/$pagePath")({
     </div>
   ),
   errorComponent: ({ error }) => (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-dvh flex items-center justify-center">
       <p className="text-destructive">{error.message}</p>
     </div>
   ),
