@@ -59,7 +59,16 @@ export function PublishDialog({
     if (!content) return;
     const cleaned = slugify(slug);
     if (!cleaned) return toast.error("Slug required");
+    if (hasFailures) {
+      const ok = window.confirm(
+        `${failures.length} pre-publish check${failures.length > 1 ? "s" : ""} failed:\n\n` +
+        failures.map((f) => `• ${f.label}${f.detail ? ` (${f.detail})` : ""}`).join("\n") +
+        `\n\nPublish anyway?`
+      );
+      if (!ok) return;
+    }
     const domainClean = customDomain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/$/, "") || null;
+
     setBusy(true);
     const { error } = await supabase.from("projects")
       .update({
