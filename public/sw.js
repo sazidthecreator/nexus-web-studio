@@ -95,3 +95,55 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+// ============================================================
+// BACKGROUND SYNC — replay queued edits when connectivity returns.
+// Pairs with src/lib/offline-cache.ts edit-queue.
+// ============================================================
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-project-edits") {
+    event.waitUntil(replayQueuedEdits());
+  }
+});
+
+async function replayQueuedEdits() {
+  // Notify the app to drain its IndexedDB queue.
+  // The page-side cache module owns the schema; SW just kicks it.
+  const clientsList = await self.clients.matchAll({ includeUncontrolled: true });
+  for (const client of clientsList) {
+    client.postMessage({ type: "sitely:drain-edit-queue" });
+  }
+}
+
+// ============================================================
+// PUSH NOTIFICATIONS — for collaboration / publish events.
+// Silent if no payload (server may send keep-alives).
+// ============================================================
+self.addEventListener("push", (event) => {
+  if (!event.data) return;
+  let payload;
+  try { payload = event.data.json(); } catch { return; }
+  const { title, body, icon, url } = payload || {};
+  if (!title) return;
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: body || "",
+      icon: icon || "/icon.svg",
+      badge: "/icon.svg",
+      data: { url: url || "/" },
+      vibrate: [100, 50, 200],
+      actions: [
+        { action: "open", title: "Open" },
+        { action: "dismiss", title: "Dismiss" },
+      ],
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  if (event.action === "dismiss") return;
+  const url = (event.notification.data && event.notification.data.url) || "/";
+  event.waitUntil(self.clients.openWindow(url));
+});
