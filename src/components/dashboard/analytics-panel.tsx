@@ -3,19 +3,22 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { BarChart2 } from "lucide-react";
+import { BarChart2, Inbox, Gauge } from "lucide-react";
 import { getProjectAnalytics } from "@/lib/analytics.functions";
 
 type Project = { id: string; name: string; published: boolean };
 
+type Range = 7 | 30 | 90;
+
 export function AnalyticsPanel({ projects }: { projects: Project[] }) {
   const published = useMemo(() => projects.filter((p) => p.published), [projects]);
   const [projectId, setProjectId] = useState<string>(published[0]?.id ?? "");
+  const [days, setDays] = useState<Range>(30);
   const fetchFn = useServerFn(getProjectAnalytics);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["analytics", projectId],
-    queryFn: () => fetchFn({ data: { projectId, days: 30 } }),
+    queryKey: ["analytics", projectId, days],
+    queryFn: () => fetchFn({ data: { projectId, days } }),
     enabled: !!projectId,
     staleTime: 60_000,
   });
@@ -37,23 +40,42 @@ export function AnalyticsPanel({ projects }: { projects: Project[] }) {
     <div className="rounded-xl border bg-card p-4 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <BarChart2 className="size-4" /> Analytics · 30d
+          <BarChart2 className="size-4" /> Analytics
         </div>
-        <select
-          value={projectId}
-          onChange={(e) => setProjectId(e.target.value)}
-          className="text-xs bg-background border rounded-md px-2 py-1 max-w-[140px]"
-          aria-label="Project"
-        >
-          {published.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
+        <div className="flex items-center gap-1">
+          <div role="tablist" aria-label="Date range" className="inline-flex rounded-md border bg-background p-0.5">
+            {([7, 30, 90] as Range[]).map((r) => (
+              <button
+                key={r}
+                role="tab"
+                aria-selected={days === r}
+                onClick={() => setDays(r)}
+                className={
+                  "px-2 py-0.5 text-[11px] rounded transition-colors " +
+                  (days === r ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground")
+                }
+              >
+                {r}d
+              </button>
+            ))}
+          </div>
+          <select
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+            className="text-xs bg-background border rounded-md px-2 py-1 max-w-[120px]"
+            aria-label="Project"
+          >
+            {published.map((p) => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         <Stat label="Views" value={data?.totalViews ?? 0} />
         <Stat label="Visitors" value={data?.uniqueVisitors ?? 0} />
+        <Stat label="Forms" value={data?.formSubmissions ?? 0} icon={<Inbox className="size-3" />} />
       </div>
 
       <div className="h-32">
@@ -74,6 +96,23 @@ export function AnalyticsPanel({ projects }: { projects: Project[] }) {
         )}
       </div>
 
+      {(data?.vitals?.length ?? 0) > 0 && (
+        <div>
+          <div className="text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
+            <Gauge className="size-3" /> Web vitals (median)
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            {data!.vitals.slice(0, 6).map((v) => (
+              <div key={v.name} className="rounded-md border bg-background px-2 py-1">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{v.name}</div>
+                <div className="text-xs font-semibold tabular-nums">{formatVital(v.name, v.median)}</div>
+                <div className="text-[10px] text-muted-foreground tabular-nums">{v.goodPct}% good</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {(data?.topPaths?.length ?? 0) > 0 && (
         <div>
           <div className="text-xs font-medium text-muted-foreground mb-1">Top pages</div>
@@ -91,11 +130,18 @@ export function AnalyticsPanel({ projects }: { projects: Project[] }) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, icon }: { label: string; value: number; icon?: React.ReactNode }) {
   return (
     <div className="rounded-md border bg-background px-2 py-1.5">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1">{icon}{label}</div>
       <div className="text-lg font-semibold tabular-nums leading-tight">{value}</div>
     </div>
   );
+}
+
+function formatVital(name: string, value: number): string {
+  // CLS is unitless (typically 0-1). Others are milliseconds.
+  if (name === "CLS") return value.toFixed(2);
+  if (value >= 1000) return (value / 1000).toFixed(2) + "s";
+  return Math.round(value) + "ms";
 }
