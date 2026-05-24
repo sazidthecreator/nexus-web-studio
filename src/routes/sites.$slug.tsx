@@ -139,6 +139,13 @@ function SitePage() {
     } catch { /* analytics is best-effort */ }
   }, [data.slug]);
 
+  // Init scroll-reveal animations + Core Web Vitals tracking once.
+  useEffect(() => {
+    const dispose = initScrollReveal();
+    if (data.id) trackVitals(data.id);
+    return () => dispose();
+  }, [data.id, blocks.length]);
+
   const typoPreset = useMemo(() => getTypoPreset(branding.typographyPreset), [branding.typographyPreset]);
   const gfHref = googleFontsHref(typoPreset);
 
@@ -149,6 +156,7 @@ function SitePage() {
       className="wb-canvas"
       style={{ fontFamily: branding.fontFamily, ...typoStyleVars(typoPreset) }}
     >
+      <ScrollProgressBar />
       {gfHref && <link rel="stylesheet" href={gfHref} />}
       {blocks.map((b) => <BlockRenderer key={b.id} block={b} branding={branding} />)}
     </div>
