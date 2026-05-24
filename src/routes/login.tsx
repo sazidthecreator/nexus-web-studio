@@ -66,7 +66,7 @@ function LoginPage() {
 
 export function AuthShell({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <main className="min-h-dvh flex items-center justify-center px-4 bg-background">
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center gap-2 font-bold text-lg mb-8">
           <div className="size-8 rounded-lg flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
@@ -80,7 +80,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
           {children}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

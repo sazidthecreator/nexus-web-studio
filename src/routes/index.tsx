@@ -147,7 +147,7 @@ function Landing() {
   };
 
   return (
-    <div ref={ref} className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div ref={ref} className="min-h-dvh bg-background text-foreground overflow-x-hidden">
       {/* Header */}
       <header className="sticky top-0 z-50">
         <div className="container mx-auto px-4 mt-4">
@@ -226,6 +226,9 @@ function Landing() {
           </div>
         </div>
       </header>
+
+      <main>
+
 
       {/* Hero */}
       <section
@@ -732,6 +735,8 @@ function Landing() {
           </div>
         </div>
       </section>
+
+      </main>
 
       <footer className="border-t border-border/40">
         <div className="container mx-auto px-4 py-10 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">

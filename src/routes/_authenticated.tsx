@@ -18,7 +18,7 @@ function AuthLayout() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
+      <div className="min-h-dvh flex items-center justify-center text-muted-foreground">
         Loading…
       </div>
     );
@@ -26,7 +26,7 @@ function AuthLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-dvh flex w-full bg-background">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center border-b border-border px-4 gap-2 bg-background/80 backdrop-blur sticky top-0 z-30">
