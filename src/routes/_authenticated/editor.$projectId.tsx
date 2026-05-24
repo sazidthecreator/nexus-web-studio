@@ -1013,6 +1013,7 @@ function EditorPage() {
                       <PropertyEditor
                         block={syntheticBlock}
                         onChange={(patch) => updateBlocksProps(selectedIds, patch)}
+                        pages={content?.pages}
                       />
                     </div>
                   )}
@@ -1035,7 +1036,11 @@ function EditorPage() {
                     Paste
                   </Button>
                 </div>
-                <PropertyEditor block={selected} onChange={(patch) => updateBlockProps(selected.id, patch)} />
+                <PropertyEditor
+                  block={selected}
+                  onChange={(patch) => updateBlockProps(selected.id, patch)}
+                  pages={content?.pages}
+                />
               </div>
             ) : (
               <p className="text-xs text-muted-foreground">Select a block in the canvas to edit its content.</p>
