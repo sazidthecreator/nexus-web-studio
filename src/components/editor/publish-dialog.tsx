@@ -189,7 +189,7 @@ export function PublishDialog({
           {currentPublished && (
             <Button variant="ghost" onClick={unpublish} disabled={busy}>Unpublish</Button>
           )}
-          <Button onClick={publish} disabled={busy || hasFailures} title={hasFailures ? "Resolve failing checks first" : undefined}>
+          <Button onClick={publish} disabled={busy} variant={hasFailures ? "outline" : "default"} title={hasFailures ? `${failures.length} check(s) failed — you'll be asked to confirm` : undefined}>
             {busy && <Loader2 className="size-3.5 animate-spin" />}
             {currentPublished ? "Republish" : "Publish"}
           </Button>
