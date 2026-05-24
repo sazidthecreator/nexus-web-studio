@@ -6,6 +6,9 @@ import { BlockRenderer } from "@/components/block-renderer";
 import { DEFAULT_BRANDING, type Block, type ProjectContent } from "@/lib/blocks";
 import { getTypoPreset, googleFontsHref, typoStyleVars } from "@/lib/typography";
 import { isRtl } from "@/lib/i18n";
+import { initScrollReveal } from "@/lib/scroll-reveal";
+import { ScrollProgressBar } from "@/components/published/scroll-progress-bar";
+import { trackVitals } from "@/lib/vitals";
 import { useEffect, useMemo } from "react";
 import { z } from "zod";
 
@@ -136,6 +139,13 @@ function SitePage() {
     } catch { /* analytics is best-effort */ }
   }, [data.slug]);
 
+  // Init scroll-reveal animations + Core Web Vitals tracking once.
+  useEffect(() => {
+    const dispose = initScrollReveal();
+    if (data.id) trackVitals(data.id);
+    return () => dispose();
+  }, [data.id, blocks.length]);
+
   const typoPreset = useMemo(() => getTypoPreset(branding.typographyPreset), [branding.typographyPreset]);
   const gfHref = googleFontsHref(typoPreset);
 
@@ -146,6 +156,7 @@ function SitePage() {
       className="wb-canvas"
       style={{ fontFamily: branding.fontFamily, ...typoStyleVars(typoPreset) }}
     >
+      <ScrollProgressBar />
       {gfHref && <link rel="stylesheet" href={gfHref} />}
       {blocks.map((b) => <BlockRenderer key={b.id} block={b} branding={branding} />)}
     </div>
