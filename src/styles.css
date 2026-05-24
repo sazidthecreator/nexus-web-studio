@@ -428,3 +428,36 @@ section[id] { scroll-margin-top: 96px; }
 @media (prefers-reduced-motion: reduce) {
   .wb-canvas { transition: none !important; }
 }
+
+/* ============================================================
+   SCROLL CHOREOGRAPHY (Sitely Elite Vol. 2 — Part 13)
+   ============================================================ */
+
+/* CSS scroll-driven parallax — zero JS. Falls back to static. */
+@supports (animation-timeline: scroll()) {
+  .parallax-hero {
+    animation: parallax-shift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 40%;
+  }
+  @keyframes parallax-shift {
+    to { transform: translateY(20%); }
+  }
+  .parallax-text {
+    animation: text-rise linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0% 50%;
+  }
+  @keyframes text-rise {
+    to { transform: translateY(-8%); opacity: 0.6; }
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  .parallax-hero, .parallax-text { transform: none; }
+}
+
+/* Reduced motion respects the user */
+@media (prefers-reduced-motion: reduce) {
+  .parallax-hero, .parallax-text { animation: none !important; transform: none !important; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
