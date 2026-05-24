@@ -66,7 +66,7 @@ import { TranslatePanel } from "@/components/editor/translate-panel";
 import { CommentsPanel } from "@/components/editor/comments-panel";
 import { PresenceBar } from "@/components/editor/presence-bar";
 import { Inbox, Languages, MessageSquare } from "lucide-react";
-import { Globe, History as HistoryIcon } from "lucide-react";
+import { Globe, History as HistoryIcon, FileText } from "lucide-react";
 import { AiProviderChip } from "@/components/editor/ai-provider-chip";
 import { PagesBar } from "@/components/editor/pages-bar";
 
