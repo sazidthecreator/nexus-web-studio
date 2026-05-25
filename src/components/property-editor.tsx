@@ -187,6 +187,8 @@ function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any
           <NumField label="Max width (px)" value={p.maxWidth ?? 960} onChange={(v) => set("maxWidth", v)} />
         </div>
       );
+    case "image_generation":
+      return <AiImageBlockControls block={block} set={set} />;
     case "gallery":
       return (
         <div className="space-y-3">
