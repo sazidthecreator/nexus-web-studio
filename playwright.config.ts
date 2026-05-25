@@ -3,15 +3,14 @@ import { execSync } from 'node:child_process';
 
 function hasBun() {
   try {
-    execSync('bun --version', { stdio: 'ignore' });
+    execSync('bun --version', { stdio: 'ignore', shell: false });
     return true;
   } catch {
     return false;
   }
 }
 
-const webServerCommand =
-  process.env.PLAYWRIGHT_WEB_SERVER_COMMAND || (hasBun() ? 'bun run dev' : 'npm run dev');
+const webServerCommand = hasBun() ? 'bun run dev' : 'npm run dev';
 
 /**
  * Playwright config for visual + performance regression.
