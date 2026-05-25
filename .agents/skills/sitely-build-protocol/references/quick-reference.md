@@ -1,79 +1,76 @@
-# Sitely Quick Reference
+# Sitely Quick Reference — Canonical Utilities
 
-## Block management
+Always import from these; never reinvent.
+
+## Blocks
 ```ts
-import { createBlock, uid, BLOCK_LIBRARY } from '@/lib/blocks'
-const block = createBlock('hero')
-const id = uid('hero')
+import { createBlock, uid, BLOCK_LIBRARY } from "@/lib/blocks";
+const block = createBlock("hero");
 ```
 
-## Offline cache
+## Offline
 ```ts
-import { cacheProject, getCachedProject, queueEdit, isOnline } from '@/lib/offline-cache'
-await cacheProject({ id, content, updatedAt: Date.now() })
+import { cacheProject, getCachedProject, queueEdit, isOnline } from "@/lib/offline-cache";
+if (!isOnline()) { queueEdit({ projectId, op, payload }); return; }
 ```
 
-## Database — always wrap
+## DB wrapper
 ```ts
-import { dbQuery } from '@/lib/db-wrapper'
-import { supabase } from '@/integrations/supabase/client'
-const project = await dbQuery(
-  supabase.from('projects').select('*').eq('id', id).single()
-)
+import { dbQuery } from "@/lib/db-wrapper";
+const { data, error } = await dbQuery(() => supabase.from("x").select());
 ```
 
 ## Errors
 ```ts
-import { handleError, ValidationError } from '@/lib/errors'
-try { await riskyOperation() } catch (e) { handleError(e) }
+import { handleError, ValidationError } from "@/lib/errors";
+try { ... } catch (e) { handleError(e); }
 ```
 
-## AI Gateway
+## AI
 ```ts
-import { invokeLLM } from '@/server/_core/llm'
-const response = await invokeLLM({ messages: [{ role: 'user', content: prompt }] })
+import { invokeLLM } from "@/server/_core/llm";
+const out = await invokeLLM({ model: "google/gemini-2.5-flash", messages });
 ```
 
-## Motion tokens — always check reduced motion
+## Motion (always branch on reduced motion)
 ```ts
-import { spring, duration, easing, prefersReducedMotion } from '@/lib/motion'
-if (prefersReducedMotion()) return simpleVariant
+import { spring, duration, easing, prefersReducedMotion } from "@/lib/motion";
+const t = prefersReducedMotion() ? { duration: 0 } : spring.gentle;
 ```
 
-## Plan gating
+## Plans
 ```ts
-import { usePlanGate, PaywallGate } from '@/lib/plans'
-const { allowed } = usePlanGate('cms_collections')
+import { usePlanGate, PaywallGate } from "@/lib/plans";
+const canUse = usePlanGate("custom-domain");
 ```
 
-## Toast pattern
+## Toasts
 ```ts
-import { saveWithToast } from '@/lib/toast-helpers'
-saveWithToast(
-  () => supabase.from('projects').update(data).eq('id', id),
-  { loading: 'Saving…', success: 'Saved!', error: 'Save failed' }
-)
+import { saveWithToast } from "@/lib/toast-helpers";
+await saveWithToast(() => save(), { loading: "Saving…", success: "Saved", error: "Couldn't save — retry?" });
 ```
 
 ## CMS
 ```ts
-import { scaffoldBlog, createCollection } from '@/lib/cms'
-await scaffoldBlog(projectId)
-
-// Public CMS query (edge-cached)
-const items = await supabase
-  .from('cms_items')
-  .select('*')
-  .eq('collection_id', collectionId)
-  .eq('is_draft', false)
-  .not('published_at', 'is', null)
-  .order('published_at', { ascending: false })
+import { scaffoldBlog, createCollection } from "@/lib/cms";
 ```
 
-## CMS-bound block render
-```tsx
-function CMSListBlock({ block, cmsContext }: { block: Block; cmsContext?: CMSContext }) {
-  const { items } = useCMSItems(block.props.collectionId, block.props.limit)
-  // render with block.props.cardTemplate
-}
-```
+## Phase quality gate checklist
+- [ ] Happy path
+- [ ] Error toast (actionable message)
+- [ ] Loading state (shape-matched skeleton)
+- [ ] Mobile ≥320px
+- [ ] Keyboard: Tab / Enter / Esc
+- [ ] 0 TS errors (`npm run check`)
+- [ ] Unit test for core logic
+- [ ] Graceful offline (queue + replay preferred)
+
+## Perf targets
+| Metric | Target |
+|---|---|
+| Published TTFB | <100ms |
+| Editor load (Fast 3G) | <2s |
+| Image gen | <5s |
+| Analytics query | <500ms |
+| Command palette open | <16ms |
+| Initial JS gzipped | <200KB |
