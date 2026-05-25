@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_generations: {
+        Row: {
+          block_id: string | null
+          created_at: string
+          id: string
+          kind: string
+          locale: string | null
+          output_text: string | null
+          output_url: string | null
+          project_id: string | null
+          prompt: string
+          revert_payload: Json | null
+          reverted_at: string | null
+          user_id: string
+        }
+        Insert: {
+          block_id?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          locale?: string | null
+          output_text?: string | null
+          output_url?: string | null
+          project_id?: string | null
+          prompt?: string
+          revert_payload?: Json | null
+          reverted_at?: string | null
+          user_id: string
+        }
+        Update: {
+          block_id?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          locale?: string | null
+          output_text?: string | null
+          output_url?: string | null
+          project_id?: string | null
+          prompt?: string
+          revert_payload?: Json | null
+          reverted_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_usage: {
         Row: {
           created_at: string
