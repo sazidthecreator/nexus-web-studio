@@ -1,11 +1,13 @@
 ---
 name: sitely-build-protocol
-description: Production build protocol for Sitely, a no-code website builder. Use when the user invokes /skill:sitely-build-protocol, asks to ship a Sitely phase (custom domain, offline/PWA, multi-page editing, analytics, AI features, block presets, templates, CMS/blog), or requests top-1% craft work on Sitely. Enforces phase order, frozen files, RLS-first migrations, offline handling, perf targets, and the 5-Before-1 read rule.
+description: Production build protocol for Sitely, a no-code website builder. Use when the user invokes /skill:sitely-build-protocol, asks to ship a Sitely phase or CMS/blog feature, or requests top-1% craft work on Sitely. Enforces phase order, frozen files, RLS-first migrations, offline handling, perf targets, the 5-Before-1 read rule, and the Vol 3 CMS/deployment stack.
 ---
 
 # Sitely Build Protocol
 
-Sitely is a no-code website builder ~85% complete. Bar is top-1% craft, not "it works". Ship only at ≥90/100 on the Vol 2 Part 25 production score.
+Sitely is a no-code website builder ~85% complete. The bar is top-1% craft, not "it works". Ship only at ≥90/100 on the Vol 2 Part 25 production score.
+
+This skill is the operating protocol for shipping Sitely features end-to-end, including the Vol 3 differentiators: CMS/blog mode, advanced error handling, edge caching, dynamic blocks, billing, white-label, SEO, and deployment runbooks.
 
 ## Operating Rules (all mandatory)
 
@@ -38,6 +40,16 @@ Sitely is a no-code website builder ~85% complete. Bar is top-1% craft, not "it 
 3. Read `src/integrations/supabase/types.ts` for DB schema.
 4. Read `src/routes/sites.$slug.tsx` for current loader.
 5. Begin work using the **5-Before-1 Rule**: read 5 related files before writing 1.
+
+## Vol 3 additions
+
+- Treat CMS/blog mode as the final differentiator and implement it only after phases 1-7 are complete.
+- For CMS work, extend the data model additively, write the migration first, then build the UI and routes.
+- Keep rich text minimal, sanitize rendered HTML, and prefer the existing block system over introducing a second editor model.
+- Use edge caching and invalidation deliberately for published pages and CMS lists/details.
+- Keep error handling simple and user-facing: normalize Supabase errors, use actionable toasts, and add boundaries where failures should stay local.
+- For billing, white-label, and SEO, use one-source-of-truth constants and keep paywalls inline rather than blocking.
+- Before production deploys, run the checklist in the source prompt: typecheck, tests, build, bundle size, Lighthouse, headers, and smoke tests.
 
 ## Craft standard (the $10 vs $200/mo difference)
 
@@ -75,3 +87,10 @@ When user says `start` or names a phase:
 3. Propose atomic changes within budget.
 4. Implement, verify R6/R10 gate.
 5. Report files-changed count vs budget, then hand off to next phase (don't auto-start).
+
+When user asks for CMS/blog work:
+1. Verify phases 1-7 are already complete or call out the dependency gap.
+2. Read the CMS-relevant files and migration state first.
+3. Add or update the migration before any code that queries the new tables.
+4. Build the CMS manager, schema builder, bound blocks, and dynamic routes in the smallest coherent slice.
+5. Validate RLS, sanitization, caching, and offline behavior before marking the work done.
