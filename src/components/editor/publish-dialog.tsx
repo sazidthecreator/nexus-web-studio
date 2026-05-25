@@ -9,6 +9,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { ProjectContent } from "@/lib/blocks";
 import { runPrePublishChecklist } from "@/lib/seo/checklist";
+import {
+  PublishCelebration,
+  hasCelebratedFirstPublish,
+  markFirstPublishCelebrated,
+} from "@/components/onboarding/publish-celebration";
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -31,6 +36,8 @@ export function PublishDialog({
   const [customDomain, setCustomDomain] = useState("");
   const [previewEnabled, setPreviewEnabled] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [celebrateOpen, setCelebrateOpen] = useState(false);
+  const [celebrateUrl, setCelebrateUrl] = useState("");
   const checklist = useMemo(() => runPrePublishChecklist(content, seo), [content, seo]);
   const failures = checklist.filter((c) => c.status === "fail");
   const hasFailures = failures.length > 0;
@@ -86,7 +93,15 @@ export function PublishDialog({
       else toast.error(error.message);
       return;
     }
-    toast.success("Site published");
+    // First-time celebration; subsequent republishes get a plain success toast.
+    if (!hasCelebratedFirstPublish()) {
+      markFirstPublishCelebrated();
+      const url = domainClean ? `https://${domainClean}` : `${window.location.origin}/sites/${cleaned}`;
+      setCelebrateUrl(url);
+      setCelebrateOpen(true);
+    } else {
+      toast.success("Site published");
+    }
     onPublished(cleaned);
   }
 
@@ -195,6 +210,11 @@ export function PublishDialog({
           </Button>
         </DialogFooter>
       </DialogContent>
+      <PublishCelebration
+        open={celebrateOpen}
+        onOpenChange={setCelebrateOpen}
+        publishedUrl={celebrateUrl}
+      />
     </Dialog>
   );
 }
