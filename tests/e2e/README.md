@@ -3,23 +3,23 @@
 ## Setup (one-time)
 
 ```bash
-bunx playwright install chromium webkit
+npx playwright install chromium webkit
 ```
 
 ## Run
 
 ```bash
 # Local (boots dev server automatically)
-bunx playwright test
+npx playwright test
 
 # Against a deployed URL
-PLAYWRIGHT_BASE_URL=https://your-site.lovable.app bunx playwright test
+PLAYWRIGHT_BASE_URL=https://your-site.lovable.app npx playwright test
 
 # Update visual baselines after intentional UI changes
-bunx playwright test --update-snapshots
+npx playwright test --update-snapshots
 
 # Open last HTML report
-bunx playwright show-report
+npx playwright show-report
 ```
 
 ## What's covered
