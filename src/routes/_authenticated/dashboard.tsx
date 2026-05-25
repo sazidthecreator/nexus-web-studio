@@ -18,6 +18,7 @@ import { AnalyticsPanel } from "@/components/dashboard/analytics-panel";
 import { useProjectsPresence, type PresencePeer } from "@/lib/use-projects-presence";
 import { PresenceAvatars } from "@/components/dashboard/presence-avatars";
 import { cacheProjectList, getCachedProjectList, isOnline } from "@/lib/offline-cache";
+import { DashboardTour, shouldShowTour, markTourSeen } from "@/components/onboarding/dashboard-tour";
 
 function useArchivedIds(): Set<string> {
   return useSyncExternalStore(
@@ -58,6 +59,7 @@ function DashboardPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [onboardOpen, setOnboardOpen] = useState(false);
   const [onboarding, setOnboarding] = useState<OnboardingResult | null>(null);
+  const [tourOpen, setTourOpen] = useState(false);
 
   // Show onboarding once on first visit (no projects + no localStorage flag).
   useEffect(() => {
@@ -174,7 +176,7 @@ function DashboardPage() {
           You're offline — showing the last cached project list. Edits will queue and sync when you reconnect.
         </div>
       )}
-      <div className="flex items-start justify-between gap-4 flex-wrap mb-8">
+      <div data-tour-target="dashboard-header" className="flex items-start justify-between gap-4 flex-wrap mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Your projects</h1>
           <p className="text-muted-foreground mt-1">
@@ -209,7 +211,7 @@ function DashboardPage() {
               {showArchived ? "Show active" : `Archived (${archivedCount})`}
             </Button>
           )}
-          <Button onClick={() => setCreateOpen(true)} size="lg" className="shadow-[var(--shadow-elegant)]">
+          <Button data-tour-target="create-project-btn" onClick={() => setCreateOpen(true)} size="lg" className="shadow-[var(--shadow-elegant)]">
             <Plus className="size-4" /> New project
           </Button>
         </div>
@@ -217,7 +219,7 @@ function DashboardPage() {
 
       {/* Quick start tiles */}
       {!showArchived && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        <div data-tour-target="quickstart-grid" className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           <QuickStart icon={Sparkles} title="Start with AI" desc="Describe your site and let AI draft it." onClick={() => setCreateOpen(true)} accent />
           <QuickStart icon={LayoutTemplate} title="Browse templates" desc="Hand-crafted starting points." onClick={() => navigate({ to: "/templates" })} />
           <QuickStart icon={FileText} title="Blank canvas" desc="Build from scratch with full control." onClick={() => setCreateOpen(true)} />
@@ -252,7 +254,7 @@ function DashboardPage() {
             <Button variant="outline" size="lg" onClick={() => navigate({ to: "/templates" })}>
               <LayoutTemplate className="size-4" /> Browse templates
             </Button>
-            <Button variant="ghost" size="lg" onClick={() => setOnboardOpen(true)}>
+            <Button variant="ghost" size="lg" onClick={() => setTourOpen(true)}>
               Take the quick tour
             </Button>
           </div>
@@ -301,8 +303,19 @@ function DashboardPage() {
           setOnboarding(r);
           if (r.start === "template") navigate({ to: "/templates" });
           else setCreateOpen(true);
+          // After the wizard, kick off the spotlight tour the first time.
+          if (shouldShowTour()) setTourOpen(true);
         }}
       />
+
+      {tourOpen && (
+        <DashboardTour
+          onDismiss={() => {
+            setTourOpen(false);
+            markTourSeen();
+          }}
+        />
+      )}
 
     </div>
   );
