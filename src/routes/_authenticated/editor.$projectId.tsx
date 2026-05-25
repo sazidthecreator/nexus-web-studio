@@ -1504,6 +1504,13 @@ function EditorPage() {
       />
       <SubmissionsPanel open={submissionsOpen} onOpenChange={setSubmissionsOpen} projectId={projectId} />
       <TranslatePanel open={translateOpen} onOpenChange={setTranslateOpen} projectId={projectId} content={content} />
+      <AiHistoryPanel
+        open={aiHistoryOpen}
+        onOpenChange={setAiHistoryOpen}
+        projectId={projectId}
+        content={content}
+        onApply={(c) => history.set(c)}
+      />
       <CommentsPanel open={commentsOpen} onOpenChange={setCommentsOpen} projectId={projectId} pageId={currentPage?.id ?? "home"} />
       <BulkFixSummaryDialog
         open={bulkSummaryOpen}
