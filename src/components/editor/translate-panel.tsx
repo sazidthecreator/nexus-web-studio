@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Loader2, Languages, Trash2, Rocket } from "lucide-react";
+import { Loader2, Languages, Trash2, Rocket, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LOCALES, translateContent, isRtl } from "@/lib/i18n";
+import { TranslateEditPanel } from "@/components/editor/translate-edit-panel";
 import type { ProjectContent } from "@/lib/blocks";
 
 export function TranslatePanel({
