@@ -209,6 +209,10 @@ function EditorPage() {
       window.localStorage.setItem("editor.minimap.open", minimapOpen ? "1" : "0");
     }
   }, [minimapOpen]);
+  useEffect(() => {
+    setAiHistoryProject(projectId);
+    return () => setAiHistoryProject(null);
+  }, [projectId]);
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
   const [leftTab, setLeftTab] = useState<"blocks" | "layers" | "ai">("blocks");
   const [sectionLibraryOpen, setSectionLibraryOpen] = useState(false);
