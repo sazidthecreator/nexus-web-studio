@@ -191,6 +191,7 @@ function EditorPage() {
   const [blogOpen, setBlogOpen] = useState(false);
 
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [aiHistoryOpen, setAiHistoryOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [healthOpen, setHealthOpen] = useState(false);
   const [bulkSummaryOpen, setBulkSummaryOpen] = useState(false);
