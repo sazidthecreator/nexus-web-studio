@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
 import type { Block, ProjectPage } from "@/lib/blocks";
 import { AssetPicker } from "./asset-picker";
+import { AiImageBlockControls } from "@/components/editor/ai-image-block-controls";
 import { pageSlug } from "@/components/editor/page-settings";
 
 type Props = {
