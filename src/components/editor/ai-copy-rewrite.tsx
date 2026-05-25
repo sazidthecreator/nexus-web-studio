@@ -71,6 +71,12 @@ export function AiCopyRewriteButton({
         }
       }
       onApply(next);
+      void logAiGeneration({
+        kind: "rewrite_site",
+        prompt: prompt.trim(),
+        output_text: `${Object.keys(rewritten).length} fields rewritten`,
+        revert_payload: { before: editable, after: rewritten, scope },
+      });
       toast.success("Copy rewritten — layout unchanged");
       setOpen(false);
     } catch (e: any) {
