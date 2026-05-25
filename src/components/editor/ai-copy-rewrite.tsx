@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ai } from "@/lib/ai-gateway";
+import { logAiGeneration } from "@/lib/ai-history";
 import type { ProjectContent } from "@/lib/blocks";
 
 const COPY_KEYS = ["headline", "subheadline", "title", "subtitle", "body", "tagline", "eyebrow", "ctaLabel"];
