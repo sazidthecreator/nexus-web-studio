@@ -143,6 +143,11 @@ export function TranslatePanel({
                 <div className="text-xs text-muted-foreground">{l.code}{l.rtl && " · RTL"}{has(l.code) && " · saved"}</div>
               </div>
               <div className="flex items-center gap-1">
+                {has(l.code) && l.code !== "en" && (
+                  <Button size="icon" variant="ghost" onClick={() => setEditLocale(l.code)} title="Edit translations" aria-label={`Edit ${l.code} translations`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                )}
                 {has(l.code) && (
                   <Button size="icon" variant="ghost" onClick={() => remove(l.code)} title="Remove" aria-label={`Remove ${l.code} translation`}>
                     <Trash2 className="size-3.5" />
@@ -155,6 +160,13 @@ export function TranslatePanel({
             </div>
           ))}
         </div>
+        <TranslateEditPanel
+          open={!!editLocale}
+          onOpenChange={(v) => !v && setEditLocale(null)}
+          projectId={projectId}
+          locale={editLocale}
+          sourceContent={content}
+        />
       </SheetContent>
     </Sheet>
   );
