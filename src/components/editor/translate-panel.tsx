@@ -16,6 +16,8 @@ export function TranslatePanel({
   const qc = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [editLocale, setEditLocale] = useState<string | null>(null);
+
 
   const { data: locales = [] } = useQuery({
     queryKey: ["project_locales", projectId, open],
