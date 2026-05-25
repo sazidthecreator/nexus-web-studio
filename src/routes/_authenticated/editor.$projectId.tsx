@@ -13,6 +13,7 @@ import { exportSiteZip } from "@/lib/export-site";
 import { TemplateIoButtons } from "@/components/editor/template-io-button";
 import { AiCopyRewriteButton } from "@/components/editor/ai-copy-rewrite";
 import { AiBlockRewriteButton } from "@/components/editor/ai-block-rewrite";
+import { AiHistoryPanel } from "@/components/editor/ai-history-panel";
 import { setAiHistoryProject } from "@/lib/ai-history";
 import { cacheProject, getCachedProject, queueEdit, isOnline } from "@/lib/offline-cache";
 import { startReplayScheduler } from "@/lib/sync/replay-scheduler";
