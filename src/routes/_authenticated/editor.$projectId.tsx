@@ -1037,6 +1037,11 @@ function EditorPage() {
                   <Button size="sm" variant="outline" className="flex-1" onClick={pasteStyles} disabled={!stylesClipboardRef.current}>
                     Paste
                   </Button>
+                  <AiBlockRewriteButton
+                    block={selected}
+                    className="flex-1"
+                    onApply={(patch) => updateBlockProps(selected.id, patch)}
+                  />
                 </div>
                 <PropertyEditor
                   block={selected}
