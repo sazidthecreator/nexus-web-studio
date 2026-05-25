@@ -883,6 +883,9 @@ function EditorPage() {
               <Download className="size-4" /> Export
             </Button>
             <AiCopyRewriteButton content={content} onApply={(c) => history.set(c)} />
+            <Button size="icon" variant="ghost" onClick={() => setAiHistoryOpen(true)} title="AI history" aria-label="AI history">
+              <Sparkles className="size-4" />
+            </Button>
             <TemplateIoButtons content={content} projectName={project?.name || "site"} onImport={(c) => history.set(c)} />
             <Button size="icon" variant="ghost" onClick={() => setHistoryOpen(true)} title="Version history" aria-label="Version history">
               <HistoryIcon className="size-4" />
