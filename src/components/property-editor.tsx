@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Plus } from "lucide-react";
 import type { Block, ProjectPage } from "@/lib/blocks";
 import { AssetPicker } from "./asset-picker";
+import { AiImageBlockControls } from "@/components/editor/ai-image-block-controls";
 import { pageSlug } from "@/components/editor/page-settings";
 
 type Props = {
@@ -186,6 +187,8 @@ function renderTypeFields(block: Props["block"], p: any, set: (k: string, v: any
           <NumField label="Max width (px)" value={p.maxWidth ?? 960} onChange={(v) => set("maxWidth", v)} />
         </div>
       );
+    case "image_generation":
+      return <AiImageBlockControls block={block} set={set} />;
     case "gallery":
       return (
         <div className="space-y-3">

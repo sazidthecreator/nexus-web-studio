@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { ai } from "@/lib/ai-gateway";
+import { logAiGeneration } from "@/lib/ai-history";
 import type { ProjectContent } from "@/lib/blocks";
 
 const COPY_KEYS = ["headline", "subheadline", "title", "subtitle", "body", "tagline", "eyebrow", "ctaLabel"];
@@ -70,6 +71,12 @@ export function AiCopyRewriteButton({
         }
       }
       onApply(next);
+      void logAiGeneration({
+        kind: "rewrite_site",
+        prompt: prompt.trim(),
+        output_text: `${Object.keys(rewritten).length} fields rewritten`,
+        revert_payload: { before: editable, after: rewritten, scope },
+      });
       toast.success("Copy rewritten — layout unchanged");
       setOpen(false);
     } catch (e: any) {

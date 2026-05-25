@@ -3,10 +3,11 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Loader2, Languages, Trash2, Rocket } from "lucide-react";
+import { Loader2, Languages, Trash2, Rocket, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { LOCALES, translateContent, isRtl } from "@/lib/i18n";
+import { TranslateEditPanel } from "@/components/editor/translate-edit-panel";
 import type { ProjectContent } from "@/lib/blocks";
 
 export function TranslatePanel({
@@ -15,6 +16,8 @@ export function TranslatePanel({
   const qc = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [editLocale, setEditLocale] = useState<string | null>(null);
+
 
   const { data: locales = [] } = useQuery({
     queryKey: ["project_locales", projectId, open],
@@ -140,6 +143,11 @@ export function TranslatePanel({
                 <div className="text-xs text-muted-foreground">{l.code}{l.rtl && " · RTL"}{has(l.code) && " · saved"}</div>
               </div>
               <div className="flex items-center gap-1">
+                {has(l.code) && l.code !== "en" && (
+                  <Button size="icon" variant="ghost" onClick={() => setEditLocale(l.code)} title="Edit translations" aria-label={`Edit ${l.code} translations`}>
+                    <Pencil className="size-3.5" />
+                  </Button>
+                )}
                 {has(l.code) && (
                   <Button size="icon" variant="ghost" onClick={() => remove(l.code)} title="Remove" aria-label={`Remove ${l.code} translation`}>
                     <Trash2 className="size-3.5" />
@@ -152,6 +160,13 @@ export function TranslatePanel({
             </div>
           ))}
         </div>
+        <TranslateEditPanel
+          open={!!editLocale}
+          onOpenChange={(v) => !v && setEditLocale(null)}
+          projectId={projectId}
+          locale={editLocale}
+          sourceContent={content}
+        />
       </SheetContent>
     </Sheet>
   );

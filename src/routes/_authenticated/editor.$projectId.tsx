@@ -12,6 +12,9 @@ import { CanvasMinimap } from "@/components/editor/canvas-minimap";
 import { exportSiteZip } from "@/lib/export-site";
 import { TemplateIoButtons } from "@/components/editor/template-io-button";
 import { AiCopyRewriteButton } from "@/components/editor/ai-copy-rewrite";
+import { AiBlockRewriteButton } from "@/components/editor/ai-block-rewrite";
+import { AiHistoryPanel } from "@/components/editor/ai-history-panel";
+import { setAiHistoryProject } from "@/lib/ai-history";
 import { cacheProject, getCachedProject, queueEdit, isOnline } from "@/lib/offline-cache";
 import { startReplayScheduler } from "@/lib/sync/replay-scheduler";
 import { toast } from "sonner";
@@ -188,6 +191,7 @@ function EditorPage() {
   const [blogOpen, setBlogOpen] = useState(false);
 
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [aiHistoryOpen, setAiHistoryOpen] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [healthOpen, setHealthOpen] = useState(false);
   const [bulkSummaryOpen, setBulkSummaryOpen] = useState(false);
@@ -207,6 +211,10 @@ function EditorPage() {
       window.localStorage.setItem("editor.minimap.open", minimapOpen ? "1" : "0");
     }
   }, [minimapOpen]);
+  useEffect(() => {
+    setAiHistoryProject(projectId);
+    return () => setAiHistoryProject(null);
+  }, [projectId]);
   const canvasScrollRef = useRef<HTMLDivElement | null>(null);
   const [leftTab, setLeftTab] = useState<"blocks" | "layers" | "ai">("blocks");
   const [sectionLibraryOpen, setSectionLibraryOpen] = useState(false);
@@ -875,6 +883,9 @@ function EditorPage() {
               <Download className="size-4" /> Export
             </Button>
             <AiCopyRewriteButton content={content} onApply={(c) => history.set(c)} />
+            <Button size="icon" variant="ghost" onClick={() => setAiHistoryOpen(true)} title="AI history" aria-label="AI history">
+              <Sparkles className="size-4" />
+            </Button>
             <TemplateIoButtons content={content} projectName={project?.name || "site"} onImport={(c) => history.set(c)} />
             <Button size="icon" variant="ghost" onClick={() => setHistoryOpen(true)} title="Version history" aria-label="Version history">
               <HistoryIcon className="size-4" />
@@ -1035,6 +1046,11 @@ function EditorPage() {
                   <Button size="sm" variant="outline" className="flex-1" onClick={pasteStyles} disabled={!stylesClipboardRef.current}>
                     Paste
                   </Button>
+                  <AiBlockRewriteButton
+                    block={selected}
+                    className="flex-1"
+                    onApply={(patch) => updateBlockProps(selected.id, patch)}
+                  />
                 </div>
                 <PropertyEditor
                   block={selected}
@@ -1488,6 +1504,13 @@ function EditorPage() {
       />
       <SubmissionsPanel open={submissionsOpen} onOpenChange={setSubmissionsOpen} projectId={projectId} />
       <TranslatePanel open={translateOpen} onOpenChange={setTranslateOpen} projectId={projectId} content={content} />
+      <AiHistoryPanel
+        open={aiHistoryOpen}
+        onOpenChange={setAiHistoryOpen}
+        projectId={projectId}
+        content={content}
+        onApply={(c) => history.set(c)}
+      />
       <CommentsPanel open={commentsOpen} onOpenChange={setCommentsOpen} projectId={projectId} pageId={currentPage?.id ?? "home"} />
       <BulkFixSummaryDialog
         open={bulkSummaryOpen}
