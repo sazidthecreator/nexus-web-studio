@@ -267,16 +267,20 @@ function Features({ block, branding }: { block: Block; branding: Branding }) {
           {items.map((it: any, i: number) => (
             <div key={i} className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${i % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
               <div
-                className="aspect-[4/3] rounded-2xl border border-slate-200"
-                style={{ background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
-                aria-hidden
-              />
+                className="aspect-[4/3] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100"
+                style={it.imageUrl ? undefined : { background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
+                aria-hidden={!it.imageUrl}
+              >
+                {it.imageUrl && (
+                  <img src={it.imageUrl} alt={it.imageAlt || it.title || ""} loading="lazy" className="w-full h-full object-cover" />
+                )}
+              </div>
               <div>
                 <div className="size-10 rounded-lg flex items-center justify-center text-xl mb-3" style={{ background: branding.primaryColor + "20" }}>
                   <span>{it.icon}</span>
                 </div>
-                <h3 className="text-2xl font-semibold text-slate-900">{it.title}</h3>
-                <p className="text-slate-600 mt-2">{it.body}</p>
+                <h3 className="text-2xl font-semibold text-slate-900 text-balance">{it.title}</h3>
+                <p className="text-slate-600 mt-2 text-pretty">{it.body}</p>
               </div>
             </div>
           ))}
