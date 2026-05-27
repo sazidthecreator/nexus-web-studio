@@ -50,21 +50,22 @@ function Navbar({ block, branding }: { block: Block; branding: Branding }) {
   const isCenter = layout === "center";
   const isStacked = layout === "stacked";
   const isMinimal = layout === "minimal";
+  const showLinks = !isMinimal && links.length > 0;
   return (
-    <header className="w-full border-b border-black/5 bg-white/70 backdrop-blur">
+    <header className="w-full border-b border-black/5 bg-white/70 backdrop-blur sticky top-0 z-30">
       <div
         className={
           isStacked
             ? "mx-auto max-w-6xl flex flex-col items-center gap-3 px-4 sm:px-6 py-4 text-center"
             : isCenter
-              ? "mx-auto max-w-6xl grid grid-cols-3 items-center px-4 sm:px-6 py-4"
-              : "mx-auto max-w-6xl flex items-center justify-between px-4 sm:px-6 py-4"
+              ? "mx-auto max-w-6xl grid grid-cols-[1fr_auto_1fr] md:grid-cols-3 items-center gap-3 px-4 sm:px-6 py-4"
+              : "mx-auto max-w-6xl flex items-center justify-between gap-3 px-4 sm:px-6 py-4"
         }
       >
-        <div className={`font-bold text-lg ${isCenter ? "justify-self-start" : ""}`} style={{ color: branding.primaryColor }}>
+        <div className={`font-bold text-lg truncate ${isCenter ? "justify-self-start" : ""}`} style={{ color: branding.primaryColor }}>
           {branding.siteName}
         </div>
-        {!isMinimal && (
+        {showLinks && (
           <nav
             className={
               isStacked
@@ -79,13 +80,41 @@ function Navbar({ block, branding }: { block: Block; branding: Branding }) {
             ))}
           </nav>
         )}
-        <a
-          href={ctaHref}
-          className={`text-sm font-medium px-3 py-1.5 rounded-md text-white ${isCenter ? "justify-self-end" : ""}`}
-          style={{ background: branding.primaryColor }}
-        >
-          {ctaLabel}
-        </a>
+        <div className={`flex items-center gap-2 ${isCenter ? "justify-self-end" : ""}`}>
+          {ctaLabel && (
+            <a
+              href={ctaHref}
+              className="hidden sm:inline-block text-sm font-medium px-3 py-1.5 rounded-md text-white whitespace-nowrap"
+              style={{ background: branding.primaryColor }}
+            >
+              {ctaLabel}
+            </a>
+          )}
+          {showLinks && !isStacked && (
+            <details className="md:hidden relative">
+              <summary
+                aria-label="Open menu"
+                className="list-none cursor-pointer size-9 inline-flex items-center justify-center rounded-md border border-slate-200 text-slate-700 [&::-webkit-details-marker]:hidden"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+              </summary>
+              <div className="absolute right-0 mt-2 w-56 rounded-lg border border-slate-200 bg-white shadow-lg p-2 flex flex-col text-sm">
+                {links.map((l: any, i: number) => (
+                  <a key={i} href={l.href} className="px-3 py-2 rounded hover:bg-slate-50 text-slate-700">{l.label}</a>
+                ))}
+                {ctaLabel && (
+                  <a
+                    href={ctaHref}
+                    className="mt-1 px-3 py-2 rounded-md text-white text-center font-medium"
+                    style={{ background: branding.primaryColor }}
+                  >
+                    {ctaLabel}
+                  </a>
+                )}
+              </div>
+            </details>
+          )}
+        </div>
       </div>
     </header>
   );
