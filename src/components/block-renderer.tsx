@@ -466,10 +466,11 @@ function Footer({ block, branding }: { block: Block; branding: Branding }) {
 
 function Heading({ block }: { block: Block }) {
   const p = block.props;
-  const align = p.align ?? "center";
+  const align = (p.align ?? "center") as "left" | "center" | "right";
+  const alignCls = align === "left" ? "text-left" : align === "right" ? "text-right" : "text-center";
   return (
     <section className="bg-white">
-      <div className={`mx-auto max-w-4xl px-4 sm:px-6 py-12 text-${align}`}>
+      <div className={`mx-auto max-w-4xl px-4 sm:px-6 py-12 ${alignCls}`}>
         <h2 className="text-3xl sm:text-4xl font-bold text-slate-900">{p.title}</h2>
         {p.subtitle && <p className="mt-3 text-slate-600">{p.subtitle}</p>}
       </div>
@@ -479,9 +480,11 @@ function Heading({ block }: { block: Block }) {
 
 function TextBlock({ block }: { block: Block }) {
   const p = block.props;
+  const align = (p.align ?? "left") as "left" | "center" | "right";
+  const alignCls = align === "left" ? "text-left" : align === "right" ? "text-right" : "text-center";
   return (
     <section className="bg-white">
-      <div className={`mx-auto max-w-3xl px-4 sm:px-6 py-8 text-${p.align ?? "left"}`}>
+      <div className={`mx-auto max-w-3xl px-4 sm:px-6 py-8 ${alignCls}`}>
         <p className="text-base sm:text-lg text-slate-700 leading-relaxed whitespace-pre-line">{p.body}</p>
       </div>
     </section>
