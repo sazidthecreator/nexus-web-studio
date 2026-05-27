@@ -40,9 +40,27 @@ serve(async (req) => {
   const t0 = Date.now();
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
   try {
-    const limited = rateLimit({ key: `import-tmpl:${ip}`, perMinute: 20, capacity: 10 });
+    // Require authenticated user to prevent unauthenticated SSRF/proxy abuse.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+    const supa = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: u } = await supa.auth.getUser();
+    const user = u?.user;
+    if (!user) {
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+
+    const limited = rateLimit({ key: `import-tmpl:${user.id}`, perMinute: 20, capacity: 10 });
     if (limited) {
-      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { ip } });
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { user: user.id } });
       return limited;
     }
 
