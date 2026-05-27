@@ -89,14 +89,40 @@ serve(async (req) => {
     const timeout = setTimeout(() => ctrl.abort(), 15_000);
     let resp: Response;
     try {
-      resp = await fetch(target.toString(), {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SitelyImporter/1.0)",
-          "Accept": "text/html,application/xhtml+xml",
-        },
-        redirect: "follow",
-        signal: ctrl.signal,
-      });
+      // Manual redirect handling so SSRF protection is re-applied to each hop.
+      // A public URL that 302s to 169.254.169.254 (cloud metadata) MUST be rejected.
+      let current = target;
+      let hops = 0;
+      while (true) {
+        resp = await fetch(current.toString(), {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (compatible; SitelyImporter/1.0)",
+            "Accept": "text/html,application/xhtml+xml",
+          },
+          redirect: "manual",
+          signal: ctrl.signal,
+        });
+        if (resp.status >= 300 && resp.status < 400) {
+          const loc = resp.headers.get("location");
+          if (!loc) break;
+          if (++hops > 5) {
+            logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "too_many_redirects" });
+            return jsonResp({ error: "Too many redirects", code: "too_many_redirects" }, 502);
+          }
+          let next: URL;
+          try { next = new URL(loc, current); } catch {
+            return jsonResp({ error: "Invalid redirect target", code: "invalid_redirect" }, 502);
+          }
+          if (!/^https?:$/.test(next.protocol) || isPrivateHost(next.hostname)) {
+            logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "blocked_redirect", meta: { host: next.hostname } });
+            return jsonResp({ error: "Redirect host not allowed", code: "blocked_redirect" }, 400);
+          }
+          try { await resp.body?.cancel(); } catch {}
+          current = next;
+          continue;
+        }
+        break;
+      }
     } finally {
       clearTimeout(timeout);
     }
