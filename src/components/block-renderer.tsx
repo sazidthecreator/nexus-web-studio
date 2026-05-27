@@ -642,13 +642,15 @@ function Gallery({ block }: { block: Block }) {
 
 function ButtonBlock({ block, branding }: { block: Block; branding: Branding }) {
   const p = block.props;
+  const align = (p.align ?? "center") as "left" | "center" | "right";
+  const justifyCls = align === "left" ? "justify-start" : align === "right" ? "justify-end" : "justify-center";
   const style: React.CSSProperties =
     p.style === "outline"
       ? { borderColor: branding.primaryColor, color: branding.primaryColor, borderWidth: 2 }
       : { background: branding.primaryColor, color: "#fff" };
   return (
     <section className="bg-white">
-      <div className={`mx-auto max-w-4xl px-4 sm:px-6 py-8 flex justify-${p.align === "left" ? "start" : p.align === "right" ? "end" : "center"}`}>
+      <div className={`mx-auto max-w-4xl px-4 sm:px-6 py-8 flex ${justifyCls}`}>
         <a href={p.href || "#"} className={`inline-block px-6 py-3 rounded-lg font-medium ${p.style === "outline" ? "border" : ""}`} style={style}>
           {p.label || "Button"}
         </a>
