@@ -325,12 +325,12 @@ function Features({ block, branding }: { block: Block; branding: Branding }) {
         {Header}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((it: any, i: number) => (
-            <div key={i} className="rounded-xl bg-white border border-slate-200 p-6">
+            <div key={i} className="rounded-xl bg-white border border-slate-200 p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300">
               <div className="size-10 rounded-lg flex items-center justify-center text-xl mb-3" style={{ background: branding.primaryColor + "20" }}>
                 <span>{it.icon}</span>
               </div>
-              <h3 className="font-semibold text-slate-900">{it.title}</h3>
-              <p className="text-sm text-slate-600 mt-1">{it.body}</p>
+              <h3 className="font-semibold text-slate-900 text-balance">{it.title}</h3>
+              <p className="text-sm text-slate-600 mt-1 text-pretty">{it.body}</p>
             </div>
           ))}
         </div>
