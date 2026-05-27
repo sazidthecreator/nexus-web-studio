@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rateLimit, logEvent, readJsonCapped, isResponse } from "../_shared/limits.ts";
 
 const corsHeaders = {
@@ -39,9 +40,27 @@ serve(async (req) => {
   const t0 = Date.now();
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
   try {
-    const limited = rateLimit({ key: `import-tmpl:${ip}`, perMinute: 20, capacity: 10 });
+    // Require authenticated user to prevent unauthenticated SSRF/proxy abuse.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+    const supa = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: u } = await supa.auth.getUser();
+    const user = u?.user;
+    if (!user) {
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+
+    const limited = rateLimit({ key: `import-tmpl:${user.id}`, perMinute: 20, capacity: 10 });
     if (limited) {
-      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { ip } });
+      logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { user: user.id } });
       return limited;
     }
 
@@ -70,14 +89,40 @@ serve(async (req) => {
     const timeout = setTimeout(() => ctrl.abort(), 15_000);
     let resp: Response;
     try {
-      resp = await fetch(target.toString(), {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SitelyImporter/1.0)",
-          "Accept": "text/html,application/xhtml+xml",
-        },
-        redirect: "follow",
-        signal: ctrl.signal,
-      });
+      // Manual redirect handling so SSRF protection is re-applied to each hop.
+      // A public URL that 302s to 169.254.169.254 (cloud metadata) MUST be rejected.
+      let current = target;
+      let hops = 0;
+      while (true) {
+        resp = await fetch(current.toString(), {
+          headers: {
+            "User-Agent": "Mozilla/5.0 (compatible; SitelyImporter/1.0)",
+            "Accept": "text/html,application/xhtml+xml",
+          },
+          redirect: "manual",
+          signal: ctrl.signal,
+        });
+        if (resp.status >= 300 && resp.status < 400) {
+          const loc = resp.headers.get("location");
+          if (!loc) break;
+          if (++hops > 5) {
+            logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "too_many_redirects" });
+            return jsonResp({ error: "Too many redirects", code: "too_many_redirects" }, 502);
+          }
+          let next: URL;
+          try { next = new URL(loc, current); } catch {
+            return jsonResp({ error: "Invalid redirect target", code: "invalid_redirect" }, 502);
+          }
+          if (!/^https?:$/.test(next.protocol) || isPrivateHost(next.hostname)) {
+            logEvent({ fn: "import-template", ok: false, ms: Date.now() - t0, err_code: "blocked_redirect", meta: { host: next.hostname } });
+            return jsonResp({ error: "Redirect host not allowed", code: "blocked_redirect" }, 400);
+          }
+          try { await resp.body?.cancel(); } catch {}
+          current = next;
+          continue;
+        }
+        break;
+      }
     } finally {
       clearTimeout(timeout);
     }

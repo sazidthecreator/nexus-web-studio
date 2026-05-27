@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { rateLimit, logEvent, readJsonCapped, isResponse } from "../_shared/limits.ts";
 
 const corsHeaders = {
@@ -36,10 +37,28 @@ serve(async (req) => {
   const t0 = Date.now();
   const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
   try {
-    // Heavy LLM call — strict per-IP limit.
-    const limited = rateLimit({ key: `gen-blocks:${ip}`, perMinute: 10, capacity: 5 });
+    // Require authenticated user — this function consumes paid AI credits.
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      logEvent({ fn: "generate-blocks", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+    const supa = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: u } = await supa.auth.getUser();
+    const user = u?.user;
+    if (!user) {
+      logEvent({ fn: "generate-blocks", ok: false, ms: Date.now() - t0, err_code: "unauthorized" });
+      return jsonResp({ error: "Unauthorized", code: "unauthorized" }, 401);
+    }
+
+    // Per-user rate limit (was per-IP — trivially bypassable).
+    const limited = rateLimit({ key: `gen-blocks:${user.id}`, perMinute: 10, capacity: 5 });
     if (limited) {
-      logEvent({ fn: "generate-blocks", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { ip } });
+      logEvent({ fn: "generate-blocks", ok: false, ms: Date.now() - t0, err_code: "rate_limited", meta: { user: user.id } });
       return limited;
     }
 
