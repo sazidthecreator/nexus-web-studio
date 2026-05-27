@@ -123,6 +123,9 @@ function Navbar({ block, branding }: { block: Block; branding: Branding }) {
 function Hero({ block, branding }: { block: Block; branding: Branding }) {
   const p = block.props;
   const layout = p.layout || "center"; // center | split | left | minimal
+  const glow: React.CSSProperties = {
+    backgroundImage: `radial-gradient(60% 60% at 50% 0%, ${branding.primaryColor}14, transparent 70%)`,
+  };
   const eyebrow = p.eyebrow && (
     <div
       className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-5"
@@ -131,34 +134,53 @@ function Hero({ block, branding }: { block: Block; branding: Branding }) {
       {p.eyebrow}
     </div>
   );
-  const ctas = (
-    <div className={`mt-8 flex items-center gap-3 flex-wrap ${layout === "center" ? "justify-center" : "justify-start"}`}>
-      <a href={p.ctaHref} className="px-5 py-2.5 rounded-lg text-white font-medium" style={{ background: branding.primaryColor }}>
-        {p.ctaLabel}
-      </a>
-      {p.secondaryLabel && (
-        <a href={p.secondaryHref} className="px-5 py-2.5 rounded-lg font-medium border border-slate-200 text-slate-800">
-          {p.secondaryLabel}
-        </a>
+  const ctaPrimary = p.ctaLabel && (
+    <a
+      href={p.ctaHref}
+      className="px-5 py-2.5 rounded-lg text-white font-medium shadow-sm hover:shadow-md transition-shadow"
+      style={{ background: branding.primaryColor }}
+    >
+      {p.ctaLabel}
+    </a>
+  );
+  const ctaSecondary = p.secondaryLabel && (
+    <a
+      href={p.secondaryHref}
+      className="px-5 py-2.5 rounded-lg font-medium border border-slate-200 text-slate-800 hover:bg-slate-50 transition-colors"
+    >
+      {p.secondaryLabel}
+    </a>
+  );
+  const ctas = (ctaPrimary || ctaSecondary) && (
+    <div className={`mt-8 flex items-center gap-3 flex-wrap ${layout === "center" || layout === "minimal" ? "justify-center" : "justify-start"}`}>
+      {ctaPrimary}
+      {ctaSecondary}
+    </div>
+  );
+
+  const Visual = (
+    <div
+      className="aspect-[4/3] rounded-2xl border border-slate-200 overflow-hidden bg-slate-50"
+      style={p.imageUrl ? undefined : { background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
+      aria-hidden={!p.imageUrl}
+    >
+      {p.imageUrl && (
+        <img src={p.imageUrl} alt={p.imageAlt || p.headline || ""} loading="eager" className="w-full h-full object-cover" />
       )}
     </div>
   );
 
   if (layout === "split") {
     return (
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-white" style={glow}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
           <div className="text-left">
             {eyebrow}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight">{p.headline}</h1>
-            <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-xl">{p.subheadline}</p>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight text-balance">{p.headline}</h1>
+            <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-xl text-pretty">{p.subheadline}</p>
             {ctas}
           </div>
-          <div
-            className="aspect-[4/3] rounded-2xl border border-slate-200"
-            style={{ background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
-            aria-hidden
-          />
+          {Visual}
         </div>
       </section>
     );
@@ -166,11 +188,11 @@ function Hero({ block, branding }: { block: Block; branding: Branding }) {
 
   if (layout === "left") {
     return (
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-white" style={glow}>
         <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24 text-left">
           {eyebrow}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight max-w-3xl">{p.headline}</h1>
-          <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl">{p.subheadline}</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight max-w-3xl text-balance">{p.headline}</h1>
+          <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl text-pretty">{p.subheadline}</p>
           {ctas}
         </div>
       </section>
@@ -179,10 +201,10 @@ function Hero({ block, branding }: { block: Block; branding: Branding }) {
 
   if (layout === "minimal") {
     return (
-      <section className="relative overflow-hidden bg-white">
+      <section className="relative overflow-hidden bg-white" style={glow}>
         <div className="mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16 text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 leading-tight">{p.headline}</h1>
-          {p.subheadline && <p className="mt-4 text-base text-slate-600">{p.subheadline}</p>}
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight text-slate-900 leading-tight text-balance">{p.headline}</h1>
+          {p.subheadline && <p className="mt-4 text-base text-slate-600 text-pretty">{p.subheadline}</p>}
           {ctas}
         </div>
       </section>
@@ -191,11 +213,11 @@ function Hero({ block, branding }: { block: Block; branding: Branding }) {
 
   // center (default)
   return (
-    <section className="relative overflow-hidden bg-white">
+    <section className="relative overflow-hidden bg-white" style={glow}>
       <div className="mx-auto max-w-5xl px-4 sm:px-6 py-16 sm:py-24 text-center">
         {eyebrow}
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight">{p.headline}</h1>
-        <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto">{p.subheadline}</p>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-slate-900 leading-tight text-balance">{p.headline}</h1>
+        <p className="mt-5 text-base sm:text-lg text-slate-600 max-w-2xl mx-auto text-pretty">{p.subheadline}</p>
         {ctas}
       </div>
     </section>
@@ -245,16 +267,20 @@ function Features({ block, branding }: { block: Block; branding: Branding }) {
           {items.map((it: any, i: number) => (
             <div key={i} className={`grid grid-cols-1 md:grid-cols-2 gap-8 items-center ${i % 2 ? "md:[&>*:first-child]:order-2" : ""}`}>
               <div
-                className="aspect-[4/3] rounded-2xl border border-slate-200"
-                style={{ background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
-                aria-hidden
-              />
+                className="aspect-[4/3] rounded-2xl border border-slate-200 overflow-hidden bg-slate-100"
+                style={it.imageUrl ? undefined : { background: `linear-gradient(135deg, ${branding.primaryColor}22, ${branding.primaryColor}10)` }}
+                aria-hidden={!it.imageUrl}
+              >
+                {it.imageUrl && (
+                  <img src={it.imageUrl} alt={it.imageAlt || it.title || ""} loading="lazy" className="w-full h-full object-cover" />
+                )}
+              </div>
               <div>
                 <div className="size-10 rounded-lg flex items-center justify-center text-xl mb-3" style={{ background: branding.primaryColor + "20" }}>
                   <span>{it.icon}</span>
                 </div>
-                <h3 className="text-2xl font-semibold text-slate-900">{it.title}</h3>
-                <p className="text-slate-600 mt-2">{it.body}</p>
+                <h3 className="text-2xl font-semibold text-slate-900 text-balance">{it.title}</h3>
+                <p className="text-slate-600 mt-2 text-pretty">{it.body}</p>
               </div>
             </div>
           ))}
@@ -299,12 +325,12 @@ function Features({ block, branding }: { block: Block; branding: Branding }) {
         {Header}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((it: any, i: number) => (
-            <div key={i} className="rounded-xl bg-white border border-slate-200 p-6">
+            <div key={i} className="rounded-xl bg-white border border-slate-200 p-6 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300">
               <div className="size-10 rounded-lg flex items-center justify-center text-xl mb-3" style={{ background: branding.primaryColor + "20" }}>
                 <span>{it.icon}</span>
               </div>
-              <h3 className="font-semibold text-slate-900">{it.title}</h3>
-              <p className="text-sm text-slate-600 mt-1">{it.body}</p>
+              <h3 className="font-semibold text-slate-900 text-balance">{it.title}</h3>
+              <p className="text-sm text-slate-600 mt-1 text-pretty">{it.body}</p>
             </div>
           ))}
         </div>
